@@ -5,29 +5,52 @@ import Home from './views/Home.vue'
 import PhSign from './views/phone/sign'
 import PhLayout from './views/phone/layout'
 import PhAns from './views/phone/ans'
+import PhTestList from './views/phone/test-list'
+import Developer from './views/developer'
 
 import Layout from './views/layout'
 import InputQuestion from './views/input-question'
+import Sign from './views/sign'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
       {
-          path:"/phsign",
+          path:"/",
+          name:"Sign",
+          component:Sign
+      },
+      {
+          path: "/:page",
+          name: "Sign",
+          component:Sign
+      },
+      {
+          path:"/mobile",
           name:"PhSign",
           component:PhSign
       },
     {
-      path: '/',
+      path: '/phlayout',
       name: 'PhLayout',
       component: PhLayout,
       children:[
           {
-              path:'/',
+              path:'phans',
               name:'PhAns',
               component:PhAns
-          }
+          },
+          {
+              path:"phtestlist",
+              name:"PhTestList",
+              component:PhTestList
+          },
+          {
+              path:"developer",
+              name:"Developer",
+              component:Developer
+          },
       ]
     },
     {
@@ -36,7 +59,7 @@ export default new Router({
         component:Layout,
         children:[
             {
-                path:'/',
+                path:'home',
                 name:"inputQuestion",
                 component:InputQuestion
             }

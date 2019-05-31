@@ -1,5 +1,6 @@
 <style lang="scss">
    .ans{
+       background:#ffffff;
        .ans-color{
            color:#ff0000;
        }
@@ -29,11 +30,27 @@
 
                }
            }
-           .success p{
-               height:230px;
-               line-height: 230px;
-               text-align: center;
-               color: #00b5ff;
+           .success{
+               background: url("../../assets/image/success.png") no-repeat center 30px;
+               background-size:100% 86px;
+               ul{
+                   padding-top:120px;
+                   font-size: 15px;
+                   margin: 0 30px 30px;
+                   li{
+                       height:28px;
+                       line-height: 28px;
+                       &:first-child{
+                           text-align: center;
+                       }
+                   }
+               }
+               .suc-btn{
+                   background:url("../../assets/image/sign-btn.png") no-repeat;
+                   background-size: 100% 100%;
+                   color: #000000;
+                   border: none;
+               }
            }
            .checked{
                    padding-top:20px;
@@ -69,11 +86,15 @@
             </section>
             <section class="checked" v-else-if="page==='c'">
                 <section v-html="completeDom"></section>
-                <el-button type="primary" round><a href="javascript:void(0);">导 出</a></el-button>
-            </section>
+                </section>
             <section class="success" v-else>
-                <p>恭喜！完成全部答题！</p>
-                <el-button type="primary" round :loading="btnLoad" @click="setAns">查看已完成答题</el-button>
+                <ul>
+                    <li>本次共计18道题</li>
+                    <li>开始：2019-05-12 10:30</li>
+                    <li>结束：2019-05-12 10:30</li>
+                    <li>恭喜挑战成功</li>
+                </ul>
+                <el-button class="suc-btn" type="primary"  :loading="btnLoad" @click="setAns">查看已完成答题</el-button>
             </section>
         </section>
         <footer>
