@@ -1,16 +1,17 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
 
+import Home from './views/Home.vue'
 import PhSign from './views/phone/sign'
 import PhLayout from './views/phone/layout'
 import PhAns from './views/phone/ans'
 import PhTestList from './views/phone/test-list'
 import Developer from './views/developer'
 
+import Sign from './views/sign'
 import Layout from './views/layout'
 import InputQuestion from './views/input-question'
-import Sign from './views/sign'
+import CreatePapers from './views/create-papers'
 
 Vue.use(Router)
 
@@ -27,7 +28,7 @@ export default new Router({
           component:Sign
       },
       {
-          path:"/mobile",
+          path:"/ph/mobile",
           name:"PhSign",
           component:PhSign
       },
@@ -60,6 +61,16 @@ export default new Router({
         children:[
             {
                 path:'home',
+                name:"home",
+                component:Home
+            },
+            {
+                path:'createpapers',
+                name:"CreatePapers",
+                component:CreatePapers
+            },
+            {
+                path:'inputquestion',
                 name:"inputQuestion",
                 component:InputQuestion
             }

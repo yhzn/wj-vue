@@ -1,8 +1,8 @@
 <style lang="scss">
    .ph-sign{
-       position: relative;
        background:url('../../assets/image/ph-bg.png') no-repeat;
        background-size:100% 100%;
+       overflow: hidden;
        .input{
            margin:0 30px 20px;
            padding-top:226px;
@@ -38,11 +38,15 @@
                background-size: 100% 100%;
            }
        }
+       .dis{
+           height:calc(100% - 18px);
+           overflow-y: auto;
+       }
        footer{
-           position: absolute;
+           /*position: absolute;*/
            font-size: 13px;
            width:100%;
-           bottom:10px;
+           /*bottom:10px;*/
            color:#ffffff;
            text-align: center;
 
@@ -57,20 +61,23 @@
 </style>
 <template>
     <section class="ph-sign ph-container">
-        <section class="input">
-            <ul>
-                <li>
-                    <input type="text" name="userNum" v-model.trim="userNum" placeholder="请输入工号">
-                    <p class="err">{{v.userNum.tips}}</p>
-                </li>
-                <li>
-                    <input type="text" name="user" v-model.trim="user" placeholder="请输入姓名">
-                    <p class="err">{{v.user.tips}}</p>
-                </li>
-            </ul>
-        </section>
-        <section class="btn">
-            <el-button class="submit" type="primary" @click="submit">登 录</el-button>
+        <section class="dis">
+            <section class="input">
+                <ul>
+                    <li>
+                        <input type="text" name="userNum" v-model.trim="userNum" placeholder="请输入工号">
+                        <p class="err">{{v.userNum.tips}}</p>
+                    </li>
+                    <li>
+                        <input type="text" name="user" v-model.trim="user" placeholder="请输入姓名">
+                        <p class="err">{{v.user.tips}}</p>
+                    </li>
+                </ul>
+            </section>
+            <section class="btn">
+                <el-button class="submit" type="primary" @click="submit">登 录</el-button>
+            </section>
+
         </section>
         <footer>
             上海延华智能科技（集团）股份有限公司 <router-link to="/phlayout/developer">技术支持</router-link>

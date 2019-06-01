@@ -1,50 +1,9 @@
 <style lang="scss">
 .input-question {
-
-    .el-switch__label--left {
-        position: relative;
-        margin-right: 7px;
-        left: 46px;
-        color: #fff;
-        z-index: -1111;
-    }
-    .el-switch__label--right {
-        position: relative;
-        margin-left: 7px;
-        right: 46px;
-        color: #fff;
-        z-index: -1111;
-    }
-    .el-switch__label.is-active {
-        z-index: 1111;
-        color: #fff;
-    }
-
-    .el-switch__label--left{
-        position: relative;
-        left: 46px;
-        color: #fff;
-        z-index: -1111;
-    }
-    .el-switch__label--right{
-        position: relative;
-        right: 46px;
-        color: #fff;
-        z-index: -1111;
-    }
-    .el-switch__label--right.is-active{
-        z-index: 1111;
-        color: #fff !important;
-    }
-    .el-switch__label--left.is-active{
-        z-index: 1111;
-        color: #9c9c9c !important;
-    }
     padding:20px;
     .tips{
-        height:36px;
+        padding:10px 0;
         font-size: 16px;
-        line-height: 36px;
         span{
             font-size: 14px;
             color:#ff0000;
@@ -85,11 +44,27 @@
             }
         }
     }
+    .classify{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
 }
 </style>
 <template>
     <section class="input-question">
         <section class="tips">录入试题 <span>（1. 试题中填答案部分请用 $ 代替；录入试题后将光标移除，2. 若试题中有 $ ，则可录入答案）</span></section>
+        <section class="classify">
+            <el-select v-model="classifyValue" placeholder="请选择试题类型">
+                <el-option
+                        v-for="item in classify"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                </el-option>
+            </el-select>
+            <el-button type="primary" @click="dialogVisible = true">创建试题类型</el-button>
+        </section>
         <section class="input">
             <el-input
                     class="input-text"
@@ -142,6 +117,19 @@
             </section>
         </section>
         <el-button v-if="answer.length!==0" type="primary" @click="submit">提 交</el-button>
+        <el-dialog
+                title="创建试题类型"
+                :visible.sync="dialogVisible"
+                top="20%"
+                width="500"
+                :before-close="handleClose"
+        >
+            <el-input v-model="createClassify" placeholder="请输入内容"></el-input>
+            <span slot="footer" class="dialog-footer">
+    <el-button @click="handleClose">取 消</el-button>
+    <el-button type="primary" @click="handlePost">确 定</el-button>
+  </span>
+        </el-dialog>
     </section>
 </template>
 <script>
@@ -150,10 +138,10 @@ export default {
     data () {
         return {
             groupOptions: [
-                {
+             {
                 value: '1',
                 label: '1'
-            }, {
+             }, {
                 value: '2',
                 label: '2'
             }, {
@@ -165,22 +153,111 @@ export default {
             }, {
                 value: '5',
                 label: '5'
+            }, {
+                value: '3',
+                label: '3'
+            }, {
+                value: '4',
+                label: '4'
+            }, {
+                value: '5',
+                label: '5'
+            }, {
+                value: '6',
+                label: '6'
+            }, {
+                value: '7',
+                label: '7'
+            }, {
+                value: '8',
+                label: '8'
+            }, {
+                value: '9',
+                label: '9'
+            }, {
+                value: '10',
+                label: '10'
+            }, {
+                value: '11',
+                label: '11'
+            }, {
+                value: '12',
+                label: '12'
+            }, {
+                value: '13',
+                label: '13'
+            }, {
+                value: '14',
+                label: '14'
+            }, {
+                value: '15',
+                label: '15'
+            }, {
+                value: '16',
+                label: '16'
+            }, {
+                value: '17',
+                label: '17'
+            }, {
+                value: '18',
+                label: '18'
+            }, {
+                value: '19',
+                label: '19'
+            }, {
+                value: '20',
+                label: '20'
             }
             ],
             groupValue:"",
             question:"",
-            answer: []
+            answer: [],
+            classify:[
+                {
+                    value:"1",
+                    label:"类型1"
+                },
+                {
+                    value:"2",
+                    label:"类型2"
+                },
+                {
+                    value:"3",
+                    label:"类型3"
+                },
+                {
+                    value:"4",
+                    label:"类型4"
+                },
+                {
+                    value:"5",
+                    label:"类型5"
+                },
+            ],
+            classifyValue:"",
+            dialogVisible:false,
+            createClassify:"",
         }
     },
     methods:{
+        handlePost () {
+            console.log(this.createClassify)
+            this.dialogVisible = false;
+            this.createClassify="";
+            this.$alert('提交成功','提示')
+
+        },
+        handleClose () {
+            this.dialogVisible = false;
+            this.createClassify="";
+        },
         setAnswerStrLength(item){
             let regEn = /[`!@#$%^&*()_+<>?:"{},.\/;'[\]]/im,
                 regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】[\]]/im;
             if(regEn.test(item.val) || regCn.test(item.val)) {
-                alert('输入答案不能有符号');
+                this.$alert('输入答案不能为空且不能有符号有符号', '标题名称');
                 return true;
             }
-
             item.len=item.val.length;
         },
         getAnswerLength (v) {
@@ -216,7 +293,7 @@ export default {
 
             })
             if(v){
-                alert('输入答案不能为空且不能有符号有符号');
+                this.$alert('输入答案不能为空且不能有符号有符号', '标题名称');
                 return false;
 
             }
@@ -228,20 +305,21 @@ export default {
                 return false;
             }
             let par={
+                classify:this.classifyValue,
                 question:this.question,
                 answer:this.answer
             }
             console.log(par)
-            fetch('http://192.168.17.168:8080/question/saveQuestion',par,"POST")
-                .then((res)=>{
-                    // this.tempArr[this.cur].state=true;
-                    // this.nextQuestion();
-                    // this.btnLoad=false;
-                })
-                .catch((err) => {
-                    // alert("数据加载异常");
-                    // this.btnLoad=false;
-                })
+            // fetch('http://192.168.17.168:8080/question/saveQuestion',par,"POST")
+            //     .then((res)=>{
+            //         // this.tempArr[this.cur].state=true;
+            //         // this.nextQuestion();
+            //         // this.btnLoad=false;
+            //     })
+            //     .catch((err) => {
+            //         // alert("数据加载异常");
+            //         // this.btnLoad=false;
+            //     })
             this.question="";
             this.answer=[]
 

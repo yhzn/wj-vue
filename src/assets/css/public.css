@@ -10,3 +10,42 @@ html,body,#app{
     overflow-x: hidden;
     overflow-y: auto;
 }
+.el-switch__label--left {
+    position: relative;
+    margin-right: 7px;
+    left: 46px;
+    color: #fff;
+    z-index: -1111;
+}
+.el-switch__label--right {
+    position: relative;
+    margin-left: 7px;
+    right: 46px;
+    color: #fff;
+    z-index: -1111;
+}
+.el-switch__label.is-active {
+    z-index: 1111;
+    color: #fff;
+}
+
+.el-switch__label--left{
+    position: relative;
+    left: 46px;
+    color: #fff;
+    z-index: -1111;
+}
+.el-switch__label--right{
+    position: relative;
+    right: 46px;
+    color: #fff;
+    z-index: -1111;
+}
+.el-switch__label--right.is-active{
+    z-index: 1111;
+    color: #fff !important;
+}
+.el-switch__label--left.is-active{
+    z-index: 1111;
+    color: #9c9c9c !important;
+}

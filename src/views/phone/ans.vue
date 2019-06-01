@@ -48,8 +48,7 @@
                .suc-btn{
                    background:url("../../assets/image/sign-btn.png") no-repeat;
                    background-size: 100% 100%;
-                   color: #000000;
-                   border: none;
+                   border:none;
                }
            }
            .checked{
@@ -86,7 +85,8 @@
             </section>
             <section class="checked" v-else-if="page==='c'">
                 <section v-html="completeDom"></section>
-                </section>
+                <!--<el-button type="primary" round><a href="javascript:void(0);">导 出</a></el-button>-->
+            </section>
             <section class="success" v-else>
                 <ul>
                     <li>本次共计18道题</li>
@@ -202,7 +202,7 @@
         },
         comPoseDom (val,s=0,f=true) {
             let domStr=(s+1)+". ";
-            let questionArr=val.question.split('*');
+            let questionArr=val.question.split('$');
             if(f){
                 val.answer={
                     questionArr,
@@ -240,51 +240,78 @@
         setInput () {
             let _this=this;
             let queStr=$('.que-str');
+            let u = navigator.userAgent, app = navigator.appVersion;
+            let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
+            let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+            let backFlag=false;
             queStr.on('keydown','input',function(e){
                 let ev=e||window.ev;
                 let index=$(this).index();
                 if(ev.keyCode===8 && index!==0 && !trim($(this).val())){
                     $('input').eq(index-1).focus();
+                    backFlag=true;
                 }
             })
-            queStr.on('keyup','input',function(e){
-                let ev=e||window.ev;
-                let inputDom=$('input');
-                let index=$(this).index();
-                if(ev.keyCode!==229){
-                    return false;
-                }
-                let name=$(this).attr('name');
-                let getGroupInput=$('input[name='+name+']');
-                let praArr=$(this).attr("data-value").split("-");
-                let start=parseInt(praArr[2]);
-                let strLength=name.split("-")[1];
-                let val=trim($(this).val());
-                let valArr=val.substr(0,strLength-start).split("");
-                for(let i=0;i<valArr.length;i++){
-                    getGroupInput.eq(start+i).val(valArr[i])
-                }
-                for(let v=0;v<getGroupInput.length;v++){
-                     _this.tempArr[praArr[0]].answer.input[praArr[1]].val+=getGroupInput.eq(v).val();
-                }
-                if(index+valArr.length>=inputDom.length){
-                    inputDom.eq(index).blur();
-                    return false;
-                }
-                let d=-1;
-                for(let j=0;j<inputDom.length;j++){
-                   if(!inputDom.eq(j).val()){
-                       d=j;
-                       break;
-                   }
-                }
-                if(d!==-1){
-                    inputDom.eq(d).focus();
-                }else{
-                    inputDom.blur();
-                }
+            if (isAndroid) {
+                //这个是安卓操作系统
+                queStr.on('keyup','input',function(e){
+                    let ev=e||window.ev;
+                    if(ev.keyCode!==229){
+                        return false;
+                    }
+                    _this.inputData(this);
+                })
+            }
+            if (isIOS) {
+                queStr.on('keyup','input',function(e){
+                    let ev=e||window.ev;
+                    if(ev.keyCode!==8){
+                        backFlag=false;
+                    }
+                })
+                queStr.on('change','input',function(e){
+                    if(backFlag){
+                        return false;
+                    }
+                    _this.inputData(this);
+                })
+            }
 
-            })
+
+        },
+        inputData (ctx) {
+            let inputDom=$('input');
+            let index=$(ctx).index();
+            let name=$(ctx).attr('name');
+            let getGroupInput=$('input[name='+name+']');
+            let praArr=$(ctx).attr("data-value").split("-");
+            let start=parseInt(praArr[2]);
+            let strLength=name.split("-")[1];
+            let val=trim($(ctx).val());
+            let valArr=val.substr(0,strLength-start).split("");
+            for(let i=0;i<valArr.length;i++){
+                getGroupInput.eq(start+i).val(valArr[i])
+            }
+            this.tempArr[praArr[0]].answer.input[praArr[1]].val="";
+            for(let v=0;v<getGroupInput.length;v++){
+                this.tempArr[praArr[0]].answer.input[praArr[1]].val+=getGroupInput.eq(v).val();
+            }
+            if(index+valArr.length>=inputDom.length){
+                inputDom.eq(index).blur();
+                return false;
+            }
+            let d=-1;
+            for(let j=0;j<inputDom.length;j++){
+                if(!inputDom.eq(j).val()){
+                    d=j;
+                    break;
+                }
+            }
+            if(d!==-1){
+                inputDom.eq(d).focus();
+            }else{
+                inputDom.blur();
+            }
 
         },
         // 获取问卷
@@ -299,6 +326,7 @@
                     alert("数据加载异常");
                 })
         },
+
 
     }
 }

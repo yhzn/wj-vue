@@ -2,8 +2,8 @@
     .layout{
         height:100%;
         width:100%;
-        background: url("../assets/image/l-bg.png") no-repeat;
-        background-size: 100% 100%;
+        /*background: url("../assets/image/l-bg.png") no-repeat;*/
+        /*background-size: 100% 100%;*/
         .header{
             display: flex;
             align-items: center;
@@ -11,12 +11,13 @@
             height:58px;
             color:#ffffff;
             background:
-                    url("../assets/image/logo.png") no-repeat 16px center,
+                    url("../assets/image/layout-logo.png") no-repeat 16px center,
                     url("../assets/image/header-bg.png") no-repeat;
-            background-size:50px 52px,100% 100%;
+            background-size:196px 52px,100% 100%;
             p{
-                margin-left: 73px;
-                font-size: 20px;
+                margin-left: 230px;
+                font-size: 18px;
+                font-weight: bold;
             }
             ul{
                 display: flex;
@@ -55,10 +56,13 @@
                 float: left;
                 height:100%;
                 width:220px;
+                background: url("../assets/image/menu-bg.png") no-repeat center bottom;
+                background-size: 100% 180px;
                 overflow: auto;
                 .el-menu{
                     min-height:100%;
                     text-align: left;
+                    background: none;
                 }
             }
             .container{
@@ -72,8 +76,7 @@
             height:30px;
             line-height: 30px;
             text-align: center;
-            color: #ffffff;
-            background: rgba(255,255,255,0.3);
+            background: rgba(155,155,155,0.3);
 
         }
     }
@@ -82,7 +85,7 @@
     <section class="layout">
         <header class="header">
             <p>
-                自助运维系统
+                考试管理系统
             </p>
             <ul>
                 <li>管理员</li>
@@ -99,33 +102,48 @@
                         @select="handleSelect"
                         @open="handleOpen"
                         @close="handleClose">
-                    <el-menu-item index="">
-                        <i class="el-icon-s-home"></i>
-                        <span slot="title">首页{{menuHighlight}}</span>
+                    <el-menu-item index="home">
+                        <!--<i class="el-icon-s-home"></i>-->
+                        <span slot="title">首页</span>
                     </el-menu-item>
-                    <el-submenu index="1">
-                        <template slot="title">
-                            <!--<i class="el-icon-location"></i>-->
-                            <span>业务处理</span>
-                        </template>
-                        <!--<el-menu-item-group>-->
-                        <el-menu-item index="home">病区</el-menu-item>
-                        <el-menu-item index="about">临床科室</el-menu-item>
-                        <el-menu-item index="">门诊收费处</el-menu-item>
-                        <el-menu-item index="">医技科室</el-menu-item>
-                        <el-menu-item index="">手术室</el-menu-item>
-                        <!--</el-menu-item-group>-->
-                    </el-submenu>
-                    <el-submenu index="2">
-                        <template slot="title">
-                            <!--<i class="el-icon-location"></i>-->
-                            <span>条目维护设置</span>
-                        </template>
-                        <!--<el-menu-item-group>-->
-                        <el-menu-item index="">设置1</el-menu-item>
-                        <el-menu-item index="">设置2</el-menu-item>
-                        <!--</el-menu-item-group>-->
-                    </el-submenu>
+                    <el-menu-item index="inputquestion">
+                        <span slot="title">试题录入</span>
+                    </el-menu-item>
+                    <el-menu-item index="createpapers">
+                        <span slot="title">考卷维护</span>
+                    </el-menu-item>
+                    <el-menu-item index="">
+                        <span slot="title">考题维护</span>
+                    </el-menu-item>
+                    <el-menu-item index="">
+                        <span slot="title">考试查询</span>
+                    </el-menu-item>
+                    <el-menu-item index="">
+                        <span slot="title">人员管理</span>
+                    </el-menu-item>
+                    <!--<el-submenu index="1">-->
+                        <!--<template slot="title">-->
+                            <!--&lt;!&ndash;<i class="el-icon-location"></i>&ndash;&gt;-->
+                            <!--<span>业务处理</span>-->
+                        <!--</template>-->
+                        <!--&lt;!&ndash;<el-menu-item-group>&ndash;&gt;-->
+                        <!--<el-menu-item index="home">病区</el-menu-item>-->
+                        <!--<el-menu-item index="about">临床科室</el-menu-item>-->
+                        <!--<el-menu-item index="">门诊收费处</el-menu-item>-->
+                        <!--<el-menu-item index="">医技科室</el-menu-item>-->
+                        <!--<el-menu-item index="">手术室</el-menu-item>-->
+                        <!--&lt;!&ndash;</el-menu-item-group>&ndash;&gt;-->
+                    <!--</el-submenu>-->
+                    <!--<el-submenu index="2">-->
+                        <!--<template slot="title">-->
+                            <!--&lt;!&ndash;<i class="el-icon-location"></i>&ndash;&gt;-->
+                            <!--<span>条目维护设置</span>-->
+                        <!--</template>-->
+                        <!--&lt;!&ndash;<el-menu-item-group>&ndash;&gt;-->
+                        <!--<el-menu-item index="">设置1</el-menu-item>-->
+                        <!--<el-menu-item index="">设置2</el-menu-item>-->
+                        <!--&lt;!&ndash;</el-menu-item-group>&ndash;&gt;-->
+                    <!--</el-submenu>-->
                     <!--<el-menu-item index="2">-->
                     <!--<i class="el-icon-menu"></i>-->
                     <!--<span slot="title">导航二</span>-->
@@ -155,7 +173,7 @@
             return {
                 user:"",
                 title:"",
-                menuHighlight:window.location.hash.replace("#/layout","").replace("?","/").split("/")[0],
+                menuHighlight:window.location.hash.replace("#/layout/","").replace("?","/").split("/")[0],
             }
         },
         // components:{
@@ -167,7 +185,7 @@
             handleOpen () {},
             handleClose () {},
             handleSelect (par) {
-                console.log(par)
+                // console.log(par)
             },
 
         }

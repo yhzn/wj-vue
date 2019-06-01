@@ -33,7 +33,7 @@
         .sign-form{
             background:url("../assets/image/com.png") no-repeat 30px center,url("../assets/image/sub-bg.png") no-repeat;
             background-color: #ffffff;
-            background-size: 360px 360px,60% 100%;
+            background-size: 300px 300px,60% 100%;
             box-shadow: 0 0 2px #cccccc;
         }
         .register{
@@ -114,8 +114,7 @@
     <section class="sign">
         <section class="b sign-form" v-if="!showPage">
             <section class="sign-in">
-                <h1>自助运维系统</h1>
-                <section class="title">与医信平台账户一致</section>
+                <h1>考试管理系统</h1>
                 <ul>
                     <li>
                         <input type="text" name="user" v-model.trim="user" placeholder="请输入用户名">
