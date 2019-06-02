@@ -5,7 +5,15 @@
       .papers{
           height: 100%;
           overflow: hidden;
+          .f-papers{
+              height:calc(100% - 62px);
+              overflow: hidden;
+          }
       }
+     .table-con{
+         height: 100%;
+         overflow: auto;
+     }
       nav{
           display: flex;
           align-items: center;
@@ -113,76 +121,78 @@
                 <el-button type="success" @click="dialogVisible=true"><i class="el-icon-plus"></i> 新增试卷</el-button>
 
             </nav>
-            <section class="papers">
-                <el-table
-                        :data="tableData"
-                        stripe
-                        style="width: 100%">
-                    <el-table-column
-                            prop="paperName"
-                            label="试卷名称"
-                            align="center"
-                    >
-                    </el-table-column>
-                    <el-table-column
-                            prop="startDate"
-                            label="开始日期"
-                            align="center"
-                            width="130">
-                    </el-table-column>
-                    <el-table-column
-                            prop="endDate"
-                            label="结束日期"
-                            align="center"
-                            width="130">
-                    </el-table-column>
-                    <el-table-column
-                            label="是否使用"
-                            align="center"
-                            width="130"
-                    >
-                        <template slot-scope="scope">
-                            <el-switch
-                                    v-model="scope.row.state"
-                                    :width=50
-                                    active-text="是"
-                                    inactive-text="否"
-                                    @change="changeState(scope.row)"
-                            >
-                            </el-switch>
-                        </template>
-                    </el-table-column>
+            <section class="f-papers">
+                <section class="table-con">
+                    <el-table
+                            :data="tableData"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                prop="paperName"
+                                label="试卷名称"
+                                align="center"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="startDate"
+                                label="开始日期"
+                                align="center"
+                                width="130">
+                        </el-table-column>
+                        <el-table-column
+                                prop="endDate"
+                                label="结束日期"
+                                align="center"
+                                width="130">
+                        </el-table-column>
+                        <el-table-column
+                                label="是否使用"
+                                align="center"
+                                width="130"
+                        >
+                            <template slot-scope="scope">
+                                <el-switch
+                                        v-model="scope.row.state"
+                                        :width=50
+                                        active-text="是"
+                                        inactive-text="否"
+                                        @change="changeState(scope.row)"
+                                >
+                                </el-switch>
+                            </template>
+                        </el-table-column>
 
-                    <el-table-column
-                            label="详情"
-                            align="center"
-                            width="130">
-                        <template slot-scope="scope">
-                            <el-popover trigger="hover" placement="top">
-                                <p>参考科室: <span v-for="(item,index) in scope.row.departments" :key="index">{{item}}</span></p>
-                                <p>试题数量: {{ scope.row.testNum }}</p>
-                                <div slot="reference" class="name-wrapper">
-                                    <el-tag size="medium">详情</el-tag>
-                                </div>
-                            </el-popover>
-                        </template>
-                    </el-table-column>
-                    <el-table-column
-                            label="操作"
-                            align="center"
-                            width="150"
-                    >
-                        <template slot-scope="scope">
-                            <el-button
-                                    size="mini"
-                                    @click="handleEdit(scope.row)">编辑</el-button>
-                            <el-button
-                                    size="mini"
-                                    type="danger"
-                                    @click="handleDelete(scope.row)">删除</el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
+                        <el-table-column
+                                label="详情"
+                                align="center"
+                                width="130">
+                            <template slot-scope="scope">
+                                <el-popover trigger="hover" placement="top">
+                                    <p>参考科室: <span v-for="(item,index) in scope.row.departments" :key="index">{{item}}</span></p>
+                                    <p>试题数量: {{ scope.row.testNum }}</p>
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">详情</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                label="操作"
+                                align="center"
+                                width="150"
+                        >
+                            <template slot-scope="scope">
+                                <el-button
+                                        size="mini"
+                                        @click="handleEdit(scope.row)">编辑</el-button>
+                                <el-button
+                                        size="mini"
+                                        type="danger"
+                                        @click="handleDelete(scope.row)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </section>
             </section>
 
         </section>

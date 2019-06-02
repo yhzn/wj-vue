@@ -2,6 +2,7 @@
     .layout{
         height:100%;
         width:100%;
+        min-width: 1200px;
         /*background: url("../assets/image/l-bg.png") no-repeat;*/
         /*background-size: 100% 100%;*/
         .header{
@@ -115,7 +116,7 @@
                     <el-menu-item index="testresult">
                         <span slot="title">考试查询</span>
                     </el-menu-item>
-                    <el-menu-item index="">
+                    <el-menu-item index="personnelmanagement">
                         <span slot="title">人员管理</span>
                     </el-menu-item>
                     <!--<el-submenu index="1">-->

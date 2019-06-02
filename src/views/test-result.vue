@@ -17,6 +17,7 @@
          height:60px;
          .btn-search{
              float: right;
+             margin-left: 15px;
          }
          .user-input{
              margin-right: 10px;
@@ -39,7 +40,9 @@
                             :value="item.value">
                     </el-option>
                 </el-select>
-                <el-button type="primary" class="btn-search" icon="el-icon-search" @click="searchPaper">搜索</el-button>
+                <el-button type="primary" class="btn-search" icon="el-icon-search" @click="searchPaper">搜 索</el-button>
+                <el-button type="primary" class="btn-search">导 出</el-button>
+
             </section>
             <section class="con">
                 <h1>2019年06月 全国卷</h1>
@@ -102,6 +105,7 @@
                         :picker-options="pickerOptions">
                 </el-date-picker>
                 <el-button type="primary" class="btn-search" icon="el-icon-search" @click="searchPer">搜索</el-button>
+                <el-button type="primary" class="btn-search">导 出</el-button>
             </section>
             <section class="con">
                 <h1>2019年05月至2019年07 某某考试情况表 </h1>
@@ -256,7 +260,6 @@
                     startTime:this.dateValue?moment(this.dateValue[0]).format("YYYY-MM-DD"):"",
                     endTime:this.dateValue?moment(this.dateValue[1]).format("YYYY-MM-DD"):"",
                 }
-                console.log(par)
             }
         }
     }

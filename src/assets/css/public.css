@@ -3,6 +3,10 @@ html,body,#app{
     width:100%;
     overflow: hidden;
 }
+#app{
+    overflow-x: auto;
+
+}
 .ph-container{
     height:100%;
     width: 100%;

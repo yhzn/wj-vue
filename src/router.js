@@ -13,6 +13,7 @@ import Layout from './views/layout'
 import InputQuestion from './views/input-question'
 import CreatePapers from './views/create-papers'
 import TestResult from './views/test-result'
+import PersonnelManagement from './views/personnel-management'
 
 Vue.use(Router)
 
@@ -64,6 +65,11 @@ export default new Router({
                 path:'home',
                 name:"home",
                 component:Home
+            },
+            {
+                path:'personnelmanagement',
+                name:"PersonnelManagement",
+                component:PersonnelManagement
             },
             {
                 path:'testresult',
