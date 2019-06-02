@@ -30,15 +30,19 @@
      }
      .add-papers{
          li{
-             display: flex;
-             align-items: center;
+             position: relative;
              margin-bottom:20px;
              p{
+                 position: absolute;
+                 top:50%;
+                 transform: translateY(-50%);
+                 float: left;
                  width:100px;
+
                  text-align: right;
              }
              section{
-                 flex-grow: 1;
+                 margin-left: 100px;
                  .add-time{
                      width:100%;
                  }
@@ -47,19 +51,17 @@
          }
      }
      .edit-paper{
-         margin-bottom: 10px;
          height:calc(100% - 60px);
          overflow: auto;
          header{
              padding-top:20px;
              h1{
                  margin-bottom: 10px;
-                 text-align: center;
                  font-size: 18px;
              }
              p{
                  font-size: 16px;
-                 text-align: center;
+                 margin-left: 10px;
              }
          }
      }
@@ -67,12 +69,20 @@
          margin-bottom: 20px;
      }
      .btn-con{
-         margin-right: 20px;
+         padding-top:20px;
+         margin: 0 10px;
          text-align: right;
+         h1{
+             float: left;
+             font-size: 22px;
+         }
      }
      .self-dialog-body{
          height:390px;
          overflow:auto;
+     }
+     .select-depart{
+         width:100%;
      }
  }
 </style>
@@ -165,11 +175,11 @@
                         <template slot-scope="scope">
                             <el-button
                                     size="mini"
-                                    @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                                    @click="handleEdit(scope.row)">编辑</el-button>
                             <el-button
                                     size="mini"
                                     type="danger"
-                                    @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                                    @click="handleDelete(scope.row)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -177,9 +187,18 @@
 
         </section>
         <section class="papers" v-show="editPaper">
+            <section class="btn-con">
+                <h1>
+                    全国考卷
+                </h1>
+                <el-button type="warning" size="mini" @click="dialogVisible=true"><i class="el-icon-edit"></i> 修改初始信息</el-button>
+                <el-button type="success"  size="mini" @click="addQuestion"><i class="el-icon-plus"></i> 添加试题</el-button>
+                <el-button type="danger"  size="mini" @click="deleteQuestion"><i class="el-icon-delete"></i> 删除试题</el-button>
+                <el-button type="primary"  size="mini" @click="back">返 回</el-button>
+            </section>
+
             <section class=" edit-paper">
                 <header>
-                    <h1>全国考卷</h1>
                     <p>2019-06-01 至 2019-06-29  考试科室：科室1、科室2</p>
                 </header>
                 <section class="tab-con">
@@ -205,19 +224,14 @@
                         </el-table-column>
                     </el-table>
                 </section>
-
-            </section>
-            <section class="btn-con">
-                <el-button type="danger" @click="deleteQuestion"><i class="el-icon-delete"></i> 删除试题</el-button>
-                <el-button type="success" @click="addQuestion"><i class="el-icon-plus"></i> 添加试题</el-button>
             </section>
         </section>
         <el-dialog
                 class="add-papers"
-                title="创新增试卷"
+                title="新增试卷"
                 :visible.sync="dialogVisible"
                 top="15%"
-                width="500"
+                width="60%"
                 :before-close="handleClose"
         >
             <ul>
@@ -226,7 +240,6 @@
                     <section>
                         <el-input v-model="addPaperName" placeholder="请输入试卷名称"></el-input>
                     </section>
-
                 </li>
                 <li>
                     <p>起止日期：</p>
@@ -243,6 +256,20 @@
                                 :picker-options="pickerOptions">
                         </el-date-picker>
 
+                    </section>
+                </li>
+                <li>
+                    <p>科室：</p>
+                    <section>
+                        <el-select class="select-depart" v-model="selectDepartValue" multiple :clearable="true" placeholder="请选择">
+                            <el-option
+                                    v-for="item in selectDepartOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value"
+                                    :disabled="item.disabled">
+                            </el-option>
+                        </el-select>
                     </section>
                 </li>
                 <li>
@@ -270,16 +297,25 @@
                 :visible.sync="dialogVisible1"
                 top="8%"
                 width="85%"
-                height="500"
-                :before-close="handleClose"
+                :before-close="handleCloseAdd"
         >
            <section class="self-dialog-body">
+               <section>
+                   <el-select v-model="classifyValue" :clearable="true" :filterable="true" placeholder="请选择试题类型">
+                       <el-option
+                               v-for="item in classify"
+                               :key="item.value"
+                               :label="item.label"
+                               :value="item.value">
+                       </el-option>
+                   </el-select>
+               </section>
                <el-table
                        ref="questionMultipleTable"
                        :data="questionTableData"
                        tooltip-effect="dark"
                        style="width: 100%"
-                       @selection-change="handleSelectionChange">
+                       @selection-change="handleSelectionChangeAdd">
                    <el-table-column
                            type="selection"
                            width="30">
@@ -295,14 +331,12 @@
                    >
                    </el-table-column>
                </el-table>
-
            </section>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="handleClose">取 消</el-button>
-                <el-button type="primary" @click="handlePost">确 定</el-button>
+                <el-button @click="handleCloseAdd">取 消</el-button>
+                <el-button type="primary" @click="handlePostAdd">确 定</el-button>
              </span>
         </el-dialog>
-
     </section>
 </template>
 <script>
@@ -310,7 +344,7 @@
     export default {
         data () {
             return {
-                editPaper:true,
+                editPaper:false,
                 paperName:"",
                 addPaperName:"",
                 addTime:"",
@@ -459,13 +493,56 @@
                     }
                 ],
                 questionMultipleSelection: [],
+                classify:[
+                    {
+                        value:"1",
+                        label:"类型1"
+                    },
+                    {
+                        value:"2",
+                        label:"类型2"
+                    },
+                    {
+                        value:"3",
+                        label:"类型3"
+                    },
+                    {
+                        value:"4",
+                        label:"类型4"
+                    },
+                    {
+                        value:"5",
+                        label:"类型5"
+                    },
+                ],
+                classifyValue:"",
+                selectDepartOptions:[
+                    {
+                        value:"1",
+                        label:"科室一"
+                    },
+                    {
+                        value:"2",
+                        label:"科室二"
+                    },
+                    {
+                        value:"3",
+                        label:"科室三"
+                    },
+                    {
+                        value:"4",
+                        label:"科室四"
+                    },
+                    {
+                        value:"5",
+                        label:"科室五"
+                    },
+                ],
+                selectDepartValue:[]
 
             }
         },
         methods:{
-            handleSelectionChange (val) {
-                this.multipleSelection = val;
-            },
             addQuestion () {
                 this.dialogVisible1 = true;
 
@@ -481,7 +558,6 @@
                     type: 'warning'
                 }).then(() => {
                     console.log(this.multipleSelection)
-
                     this.$message({
                         type: 'success',
                         message: '删除成功!'
@@ -493,21 +569,57 @@
                     });
                 });
             },
+            handleSelectionChangeAdd (val) {
+                this.questionMultipleSelection = val;
+            },
+            handlePostAdd () {
+                // 取消选择
+                console.log(this.questionMultipleSelection)
+                this.dialogVisible1 = false;
+                this.$refs.questionMultipleTable.clearSelection();
+            },
+            handleCloseAdd () {
+                this.dialogVisible1 = false;
+                this.$refs.questionMultipleTable.clearSelection();
+            },
+            handleSelectionChange (val) {
+                this.multipleSelection = val;
+            },
+            back () {
+                this.editPaper=false;
+                this.addPaperName="";
+                this.addTime="";
+                this.selectDepartValue=[];
+                this.addState=false;
+            },
             handlePost () {
-                // 新增试卷
                 let par={
-                        addPaperName:this.addPaperName,
-                        startTime:this.addTime?moment(this.addTime[0]).format('YYYY-MM-DD' ):"",
-                        endTime:this.addTime?moment(this.addTime[1]).format('YYYY-MM-DD' ):"",
-                        addState:this.addState
+                    addPaperName:this.addPaperName,
+                    startTime:this.addTime?moment(this.addTime[0]).format('YYYY-MM-DD' ):"",
+                    endTime:this.addTime?moment(this.addTime[1]).format('YYYY-MM-DD' ):"",
+                    selectDepartValue:this.selectDepartValue,
+                    addState:this.addState
+                }
+
+                // 新增试卷
+                if(this.editPaper){
+                    // 修改试卷
+                    console.log('修改试卷')
+
+                }else{
+                    // 新增试卷
+                    console.log('新增试卷')
+                    this.dialogVisible = false;
+                    this.addPaperName="";
+                    this.addTime="";
+                    this.selectDepartValue=[];
+                    this.addState=false;
+
+
                 }
                 this.dialogVisible = false;
                 console.log(par)
                 this.$alert('提交成功','提示')
-                this.dialogVisible = false;
-                this.addPaperName="";
-                this.addTime="";
-                this.addState=false;
 
             },
             handleClose () {
@@ -516,8 +628,13 @@
                 this.addTime="";
                 this.addState=false;
             },
-            handleEdit () {
+            handleEdit (row) {
                 // 编辑试卷
+                console.log(row)
+                this.addPaperName=row.paperName;
+                this.addTime=[new Date(row.startDate),new Date(row.endDate)];
+                this.addState=row.state;
+
                 this.editPaper=true;
             },
             handleDelete () {

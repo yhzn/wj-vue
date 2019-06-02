@@ -49,3 +49,23 @@ html,body,#app{
     z-index: 1111;
     color: #9c9c9c !important;
 }
+.tab-container {
+    height: 100%;
+    overflow: hidden;
+}
+.tab-container .el-tabs__header {
+    height: 50px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.tab-container .el-tabs__header .el-tabs__nav{
+    height: 50px;
+    line-height: 55px;
+}
+.tab-container .el-tabs__content {
+    height: calc(100% - 65px);
+    overflow: auto;
+}
+.tab-container .el-tab-pane{
+    margin: 0 20px;
+}

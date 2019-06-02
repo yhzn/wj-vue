@@ -107,15 +107,12 @@
                         <span slot="title">首页</span>
                     </el-menu-item>
                     <el-menu-item index="inputquestion">
-                        <span slot="title">试题录入</span>
+                        <span slot="title">试题维护</span>
                     </el-menu-item>
                     <el-menu-item index="createpapers">
-                        <span slot="title">考卷维护</span>
+                        <span slot="title">试卷维护</span>
                     </el-menu-item>
-                    <el-menu-item index="">
-                        <span slot="title">考题维护</span>
-                    </el-menu-item>
-                    <el-menu-item index="">
+                    <el-menu-item index="testresult">
                         <span slot="title">考试查询</span>
                     </el-menu-item>
                     <el-menu-item index="">

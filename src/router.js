@@ -12,6 +12,7 @@ import Sign from './views/sign'
 import Layout from './views/layout'
 import InputQuestion from './views/input-question'
 import CreatePapers from './views/create-papers'
+import TestResult from './views/test-result'
 
 Vue.use(Router)
 
@@ -63,6 +64,11 @@ export default new Router({
                 path:'home',
                 name:"home",
                 component:Home
+            },
+            {
+                path:'testresult',
+                name:"TestResult",
+                component:TestResult
             },
             {
                 path:'createpapers',
