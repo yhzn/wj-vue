@@ -36,7 +36,7 @@
                <li>
                    <el-select v-model="department" class="input" placeholder="请选择科室">
                        <el-option
-                               v-for="item in departmentOptions"
+                               v-for="item in departments"
                                :key="item.value"
                                :label="item.label"
                                :value="item.value">
@@ -123,6 +123,7 @@
     </section>
 </template>
 <script>
+    import {mapState} from 'vuex'
     export default {
         data () {
             return {
@@ -131,7 +132,20 @@
                department:'',
                jobOptions:[],
                job:'',
-               adminOptions:[],
+               adminOptions:[
+                   {
+                       value:"",
+                       label:'全部'
+                   },
+                   {
+                       value:"1",
+                       label:'有管理权限'
+                   },
+                   {
+                       value:"2",
+                       label:'无管理权限'
+                   },
+               ],
                admin:"",
                 tableData: [
                     {
@@ -184,6 +198,9 @@
                     }
                 ]
             }
+        },
+        computed:{
+            ...mapState(['departments']),
         },
         mounted () {},
         methods:{

@@ -38,7 +38,46 @@ export let countDown = (ctx,buttonText,fn=()=>{},sec=60) => {
         }
     },1000)
 }
+export let setCookie = function (name, value, day) {
+    if(day !== 0){     //当设置的时间等于0时，不设置expires属性，cookie在浏览器关闭后删除
+        let expires = day * 24 * 60 * 60 * 1000;
+        let date = new Date(+new Date()+expires);
+        document.cookie = name + "=" + escape(value) + ";expires=" + date.toUTCString();
+    }else{
+        document.cookie = name + "=" + escape(value);
+    }
+};
 
+export let getCookie = (name) => {
+    let reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+    let arr= document.cookie.match(reg);
+    if (arr){
+        return unescape(arr[2]);
+
+    }else{
+        return null
+    }
+};
+export let delCookie = function (name) {
+    setCookie(name, ' ', -1);
+};
+export let getUrlParam = function (name) {
+    let after = window.location.hash;
+    let index =after.indexOf('?');
+    if(index === -1) { //如果url中没有传参直接返回空
+        return null
+    }
+    //key存在先通过search取值如果取不到就通过hash来取
+    if(after){
+        let reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        let r = after.slice(index+1).match(reg);
+        if(r != null) {
+            return  decodeURIComponent(r[2]);
+        } else {
+            return null;
+        }
+    }
+}
 export let trim = (str) => {
     return str.replace(/\s|\xA0/g,"");
 }

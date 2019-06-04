@@ -5,12 +5,10 @@ html,body,#app{
 }
 #app{
     overflow-x: auto;
-
 }
 .ph-container{
     height:100%;
     width: 100%;
-
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -62,8 +60,13 @@ html,body,#app{
     margin-left: 10px;
     margin-right: 10px;
 }
+.tab-container .el-tabs__header .el-tabs__item{
+    width:120px;
+    text-align: center;
+}
 .tab-container .el-tabs__header .el-tabs__nav{
     height: 50px;
+    width:260px;
     line-height: 55px;
 }
 .tab-container .el-tabs__content {

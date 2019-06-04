@@ -100,7 +100,14 @@
             <nav>
                 <ul class="clearfix">
                     <li>
-                        <el-input v-model="paperName" placeholder="请输入试卷名称"></el-input>
+                        <el-select v-model="paperName"  :clearable="true" :filterable="true" placeholder="请选择试卷">
+                            <el-option
+                                    v-for="item in papers"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
                     </li>
                     <li>
                         <el-date-picker
@@ -238,7 +245,7 @@
         </section>
         <el-dialog
                 class="add-papers"
-                title="新增试卷"
+                :title="editPaper?'修改初始信息':'新增试卷'"
                 :visible.sync="dialogVisible"
                 top="15%"
                 width="60%"
@@ -271,10 +278,10 @@
                 <li>
                     <p>科室：</p>
                     <section>
-                        <el-select class="select-depart" v-model="selectDepartValue" multiple :clearable="true" placeholder="请选择">
+                        <el-select class="select-depart" v-model="selectDepartValue" multiple :clearable="true" placeholder="请选择科室">
                             <el-option
-                                    v-for="item in selectDepartOptions"
-                                    :key="item.value"
+                                    v-for="(item,i) in departments"
+                                    :key="i"
                                     :label="item.label"
                                     :value="item.value"
                                     :disabled="item.disabled">
@@ -313,8 +320,8 @@
                <section>
                    <el-select v-model="classifyValue" :clearable="true" :filterable="true" placeholder="请选择试题类型">
                        <el-option
-                               v-for="item in classify"
-                               :key="item.value"
+                               v-for="(item,i) in questionsType"
+                               :key="i"
                                :label="item.label"
                                :value="item.value">
                        </el-option>
@@ -351,6 +358,7 @@
 </template>
 <script>
     import moment from 'moment'
+    import {mapState,mapActions} from 'vuex'
     export default {
         data () {
             return {
@@ -552,7 +560,11 @@
 
             }
         },
+        computed:{
+            ...mapState(['departments','papers','questionsType'])
+        },
         methods:{
+            ...mapActions(['setPapers']),
             addQuestion () {
                 this.dialogVisible1 = true;
 
@@ -619,6 +631,23 @@
                 }else{
                     // 新增试卷
                     console.log('新增试卷')
+
+                    // 新增试卷后更新试卷列表
+                    let data=[
+                        {
+                            value:"1",
+                            label:"更新试卷1",
+                        },
+                        {
+                            value:"2",
+                            label:"更新试卷2",
+                        },
+                        {
+                            value:"3",
+                            label:"更新试卷3",
+                        },
+                    ]
+                    this.setPapers(data)
                     this.dialogVisible = false;
                     this.addPaperName="";
                     this.addTime="";

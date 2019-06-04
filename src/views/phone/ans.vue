@@ -105,7 +105,7 @@
 <script>
     import fetch from '@/config/fetch'
     import $ from 'jquery'
-    import {trim} from "../../tool/tool";
+    import {trim,getUrlParam} from "../../tool/tool";
 
     export default {
     data () {
@@ -156,6 +156,7 @@
         },
     },
     mounted () {
+        console.log(getUrlParam('id'))
         this.getData();
         this.setInput();
     },
@@ -189,7 +190,7 @@
         postAns () {
             console.log(this.tempArr[this.cur])
             this.btnLoad=true;
-            fetch('data.json')
+            fetch('data.json',{},'get','user')
                 .then((res)=>{
                     this.tempArr[this.cur].state=true;
                     this.nextQuestion();

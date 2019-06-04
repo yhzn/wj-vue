@@ -2,7 +2,7 @@ import {
     baseUrl
 } from './env'
 
-export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
+export default async(url = '', data = {}, type = 'GET', token='',method = 'fetch') => {
     type = type.toUpperCase();
     url = baseUrl + url;
 
@@ -17,14 +17,14 @@ export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
             url = url + '?' + dataStr;
         }
     }
-
     if (window.fetch && method == 'fetch') {
         let requestConfig = {
             credentials: 'include',
             method: type,
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Token':token,
             },
             mode: "cors",
             cache: "force-cache"
@@ -59,6 +59,7 @@ export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
 
             requestObj.open(type, url, true);
             requestObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            requestObj.setRequestHeader("Token",token);
             requestObj.send(sendData);
 
             requestObj.onreadystatechange = () => {

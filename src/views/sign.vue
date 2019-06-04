@@ -170,7 +170,7 @@
 </template>
 <script>
     import {validate} from "@/validate/validator";
-    import {clone,countDown} from "../tool/tool";
+    import {getCookie,setCookie,clone,countDown} from "../tool/tool";
     let signInRules={
         user:{
             required:true,
@@ -267,6 +267,11 @@
         methods:{
             resetV (page) {
                 if(!page){
+                    let userInfo=JSON.parse(getCookie('userInfo'));
+                    if(!!userInfo){
+                        this.user=userInfo.user;
+                        this.password=userInfo.password;
+                    }
                     this.signInRules=clone(signInRules);
                 }else{
                     this.v=clone(v);
@@ -287,10 +292,14 @@
                 }
                 console.log("校验通过");
                 console.log(par)
+                setCookie('userInfo',JSON.stringify({
+                    user:this.user,
+                    password:this.password
+                }))
                 this.$router.push('/layout/home');
             },
             submit () {
-                 let par={
+                let par={
                         user:this.user,
                         phoneNum:this.phoneNum,
                         code:this.code,
@@ -303,6 +312,8 @@
                 }
                 console.log("校验通过")
                 console.log(par)
+                this.$router.go(-1)
+
             }
         }
     }

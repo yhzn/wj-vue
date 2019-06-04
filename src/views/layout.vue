@@ -126,9 +126,9 @@
                         <!--</template>-->
                         <!--&lt;!&ndash;<el-menu-item-group>&ndash;&gt;-->
                         <!--<el-menu-item index="home">病区</el-menu-item>-->
-                        <!--<el-menu-item index="about">临床科室</el-menu-item>-->
+                        <!--<el-menu-item index="about">临床试题类型</el-menu-item>-->
                         <!--<el-menu-item index="">门诊收费处</el-menu-item>-->
-                        <!--<el-menu-item index="">医技科室</el-menu-item>-->
+                        <!--<el-menu-item index="">医技试题类型</el-menu-item>-->
                         <!--<el-menu-item index="">手术室</el-menu-item>-->
                         <!--&lt;!&ndash;</el-menu-item-group>&ndash;&gt;-->
                     <!--</el-submenu>-->
@@ -166,6 +166,7 @@
     </section>
 </template>
 <script>
+    import {mapMutations,mapActions} from 'vuex'
     export default {
         data () {
             return {
@@ -174,17 +175,53 @@
                 menuHighlight:window.location.hash.replace("#/layout/","").replace("?","/").split("/")[0],
             }
         },
-        // components:{
-        //
-        // },
         mounted () {
+            console.log(123)
+            this.getDepartments();
+            this.getQuestionsType();
+            this.getPapers();
         },
         methods:{
+            // ...mapMutations(['setDepartments']),
+            ...mapActions(['setQuestionsType','setDepartments','setPapers']),
             handleOpen () {},
             handleClose () {},
             handleSelect (par) {
                 // console.log(par)
             },
+            getQuestionsType () {
+                let data=[
+                    {value:"1",label:"试题类型1"},
+                    {value:"2",label:"试题类型1"},
+                    {value:"3",label:"试题类型1"},
+                    {value:"4",label:"试题类型1"}
+                    ]
+                // this.$store.commit('setDepartments',data)
+                // this.$store.dispatch('setDepartments',data)
+                this.setQuestionsType(data);
+            },
+            getDepartments () {
+                let data=[
+                    {value:"1",label:"科室1"},
+                    {value:"2",label:"科室2"},
+                    {value:"3",label:"科室3"},
+                    {value:"4",label:"科室4"},
+                    {value:"5",label:"科室5"},
+                    {value:"6",label:"科室6"}
+                ]
+                this.setDepartments(data);
+            },
+            getPapers () {
+                let data=[
+                    {value:"1",label:"试卷1"},
+                    {value:"2",label:"试卷2"},
+                    {value:"3",label:"试卷3"},
+                    {value:"4",label:"试卷4"},
+                    {value:"5",label:"试卷5"},
+                    {value:"6",label:"试卷6"}
+                ]
+                this.setPapers(data)
+            }
 
         }
     }

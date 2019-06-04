@@ -86,6 +86,7 @@
 </template>
 <script>
     import {validate} from "../../validate/validator";
+    import {getCookie,setCookie} from "../../tool/tool";
     export default {
         data () {
             return {
@@ -108,15 +109,22 @@
             }
         },
         mounted () {
-
+           let userInfo=JSON.parse(getCookie('phUserInfo'));
+           if(!!userInfo){
+               this.user=userInfo.user;
+               this.userNum=userInfo.userNum;
+           }
         },
         methods:{
             submit () {
-                console.log(12)
                 if(!validate({ctx:this,rules:this.v})){
                     return false;
                 }
                 console.log("校验通过");
+                setCookie('phUserInfo',JSON.stringify({
+                    user:this.user,
+                    userNum:this.userNum
+                }));
                 this.$router.push('/phlayout/phtestlist');
 
             }

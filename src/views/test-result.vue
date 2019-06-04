@@ -30,11 +30,11 @@
 </style>
 <template>
     <el-tabs v-model="activeName" class="test-result tab-container">
-        <el-tab-pane label="按考卷查询" name="first">
+        <el-tab-pane label="按试卷查询" name="first">
             <section class="search-bar">
                 <el-select v-model="paperName"  :clearable="true" :filterable="true" placeholder="请选择试卷">
                     <el-option
-                            v-for="item in options"
+                            v-for="item in papers"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value">
@@ -93,7 +93,7 @@
         </el-tab-pane>
         <el-tab-pane label="按人员查询" name="second">
             <section class="search-bar">
-                <el-input v-model="name" placeholder="请输入内容" class="user-input"></el-input>
+                <el-input v-model="name" placeholder="请输入姓名" class="user-input"></el-input>
                 <el-date-picker
                         v-model="dateValue"
                         type="daterange"
@@ -109,7 +109,12 @@
             </section>
             <section class="con">
                 <h1>2019年05月至2019年07 某某考试情况表 </h1>
-                <p class="tip">工号：001 姓名：海里 科室：外科 岗位：护理</p>
+                <p class="tip">
+                    工号：001 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    姓名：海里 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    科室：外科 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    岗位：护理
+                </p>
                 <el-table
                         :data="perData"
                         stripe
@@ -155,6 +160,7 @@
     </el-tabs>
 </template>
 <script>
+    import {mapState} from 'vuex'
     import moment from 'moment'
     export default {
         data () {
@@ -247,6 +253,9 @@
                 name:''
 
             }
+        },
+        computed:{
+            ...mapState(['papers'])
         },
         methods:{
             searchPaper () {
