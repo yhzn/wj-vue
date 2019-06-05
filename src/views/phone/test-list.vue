@@ -62,22 +62,22 @@
         <section class="bg">
             <section class="info">
                 <ul class="clearfix">
-                    <li>姓名：张三</li>
-                    <li>工号：ZS0152</li>
-                    <li>科室：内科</li>
-                    <li>岗位：医生</li>
+                    <li>姓名：{{data.info.name}}</li>
+                    <li>工号：{{data.info.num}}</li>
+                    <li>科室：{{data.info.department}}</li>
+                    <li>岗位：{{data.info.job}}</li>
                 </ul>
             </section>
-            <section :class="['list',{active:item.pass}]" v-for="(item,index) in data.list" :key="index">
-                <router-link :to="{path:`/phlayout/phans?id=${item.id}`}">
+            <section :class="['list',{active:item.passState}]" v-for="(item,index) in data.list" :key="index">
+                <router-link :to="{path:`/phlayout/phans?id=${item.examNumber}`}">
                     <section class="n">
                         <section class="tip">
-                            <span v-if="!item.pass">{{item.cur}} / {{item.total}}</span>
+                            <span v-if="!item.passState ">{{item.cur}} / {{item.total}}</span>
                         </section>
-                        <h1>{{item.paperName}}</h1>
+                        <h1>{{item.examName}}</h1>
 
                     </section>
-                    <p>有效期限:{{item.startTime}}-----{{item.endTime}}</p>
+                    <p>有效期限:{{item.effectiveBeginTime}}------{{item.effectiveEndTime}}</p>
                 </router-link>
             </section>
 
@@ -87,6 +87,8 @@
 <script>
     import {mapState,mapActions} from 'vuex'
     import BScroll from 'better-scroll'
+    import fetch from '@/config/fetch'
+    import {getCookie} from "@/tool/tool";
     export default {
         data () {
             return {
@@ -120,107 +122,24 @@
                 })
             },
             getData () {
-                let data={
-                    info:{
-                        name:"海里",
-                        num:"003",
-                        dep:"外科",
-                        job:"护理"
-                    },
-                    list:[
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:false
-                        },
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:true
-                        },
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:false
-                        },
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:false
-                        },
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:false
-                        },
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:false
-                        },
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:false
-                        },
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:false
-                        },
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:false
-                        },
-                        {
-                            id:1,
-                            paperName:"第一套",
-                            startTime:"2019-06-01",
-                            endTime:"2019-07-08",
-                            cur:5,
-                            total:20,
-                            pass:false
-                        },
-                    ]
-                }
-                this.data=data;
+                fetch('/examination/listForMobile',{},'POST',JSON.parse(getCookie('phToken')))
+                .then((res)=>{
+                      if(res.code===0){
+                            this.data={
+                                info:{
+                                    name:res.data.staffName,
+                                    num:res.data.staffNumber,
+                                    department:"***",
+                                    job:res.data.jobTitle,
+                                },
+                                list: res.data.examMains
+                            }
+                      }
+                })
+                .catch((err)=>{
+
+                })
+
             }
         }
 

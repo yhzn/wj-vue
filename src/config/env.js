@@ -11,7 +11,7 @@ let baseUrl = '';
 
 
 if (process.env.NODE_ENV == 'development') {
-    baseUrl = '';
+    baseUrl = 'http://192.168.17.168:8012';
 
 }else if(process.env.NODE_ENV == 'production'){
     baseUrl = '';

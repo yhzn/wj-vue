@@ -290,7 +290,7 @@
 </template>
 <script>
     import {mapState,mapActions} from 'vuex'
-    import {trim} from "../tool/tool";
+    import {trim} from "@/tool/tool";
     import fetch from '@/config/fetch'
     export default {
         data () {
@@ -567,6 +567,13 @@
                     question:this.question,
                     answer:this.answer
                 }
+                fetch('/question/save',par,'post')
+                .then((res)=>{
+
+                })
+                .catch((err)=>{
+
+                })
                 console.log(par)
                 // fetch('http://192.168.17.168:8080/question/saveQuestion',par,"POST")
                 //     .then((res)=>{
