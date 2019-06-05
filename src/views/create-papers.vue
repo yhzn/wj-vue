@@ -135,19 +135,19 @@
                             stripe
                             style="width: 100%">
                         <el-table-column
-                                prop="paperName"
+                                prop="examName"
                                 label="试卷名称"
                                 align="center"
                         >
                         </el-table-column>
                         <el-table-column
-                                prop="startDate"
+                                prop="effectiveBeginTime"
                                 label="开始日期"
                                 align="center"
                                 width="130">
                         </el-table-column>
                         <el-table-column
-                                prop="endDate"
+                                prop="effectiveEndTime"
                                 label="结束日期"
                                 align="center"
                                 width="130">
@@ -159,8 +159,10 @@
                         >
                             <template slot-scope="scope">
                                 <el-switch
-                                        v-model="scope.row.state"
+                                        v-model="scope.row.flag"
                                         :width=50
+                                        active-value="1"
+                                        inactive-value="0"
                                         active-text="是"
                                         inactive-text="否"
                                         @change="changeState(scope.row)"
@@ -221,7 +223,7 @@
                 <section class="tab-con">
                     <el-table
                             ref="multipleTable"
-                            :data="testTableData"
+                            :data="paperQueTableData"
                             tooltip-effect="dark"
                             style="width: 100%"
                             @selection-change="handleSelectionChange">
@@ -295,6 +297,8 @@
                         <el-switch
                                 v-model="addState"
                                 :width=50
+                                active-value="1"
+                                inactive-value="0"
                                 active-text="是"
                                 inactive-text="否"
                         >
@@ -359,6 +363,7 @@
 <script>
     import moment from 'moment'
     import {mapState,mapActions} from 'vuex'
+    import fetch from '@/config/fetch'
     export default {
         data () {
             return {
@@ -366,7 +371,7 @@
                 paperName:"",
                 addPaperName:"",
                 addTime:"",
-                addState:false,
+                addState:"0",
                 tableData: [
                     {
                         id:1,
@@ -511,6 +516,7 @@
                     }
                 ],
                 questionMultipleSelection: [],
+                paperQueTableData:[],
                 classify:[
                     {
                         value:"1",
@@ -556,12 +562,16 @@
                         label:"科室五"
                     },
                 ],
-                selectDepartValue:[]
+                selectDepartValue:[],
+                paperId:null
 
             }
         },
         computed:{
             ...mapState(['departments','papers','questionsType'])
+        },
+        mounted () {
+           this.getData();
         },
         methods:{
             ...mapActions(['setPapers']),
@@ -612,69 +622,73 @@
                 this.addPaperName="";
                 this.addTime="";
                 this.selectDepartValue=[];
-                this.addState=false;
+                this.addState="0";
             },
             handlePost () {
-                let par={
-                    addPaperName:this.addPaperName,
-                    startTime:this.addTime?moment(this.addTime[0]).format('YYYY-MM-DD' ):"",
-                    endTime:this.addTime?moment(this.addTime[1]).format('YYYY-MM-DD' ):"",
-                    selectDepartValue:this.selectDepartValue,
-                    addState:this.addState
+                let url,par={
+                    examName:this.addPaperName,
+                    effectiveBeginTime:this.addTime?moment(this.addTime[0]).format('YYYY-MM-DD' ):"",
+                    effectiveEndTime:this.addTime?moment(this.addTime[1]).format('YYYY-MM-DD' ):"",
+                    examDept:this.selectDepartValue,
+                    flag:this.addState,
+                    examNumber:this.paperId
                 }
+
 
                 // 新增试卷
                 if(this.editPaper){
                     // 修改试卷
-                    console.log('修改试卷')
-
+                    url='/examination/update'
                 }else{
                     // 新增试卷
-                    console.log('新增试卷')
-
-                    // 新增试卷后更新试卷列表
-                    let data=[
-                        {
-                            value:"1",
-                            label:"更新试卷1",
-                        },
-                        {
-                            value:"2",
-                            label:"更新试卷2",
-                        },
-                        {
-                            value:"3",
-                            label:"更新试卷3",
-                        },
-                    ]
-                    this.setPapers(data)
-                    this.dialogVisible = false;
-                    this.addPaperName="";
-                    this.addTime="";
-                    this.selectDepartValue=[];
-                    this.addState=false;
-
-
+                    url='/examination/save'
                 }
-                this.dialogVisible = false;
-                console.log(par)
-                this.$alert('提交成功','提示')
+                fetch(url,par,'post')
+                .then((res)=>{
+                   this.$alert(res.msg,"提示");
 
+                   this.getData()
+                   this.dialogVisible = false;
+                   if(!this.editPaper){
+                          this.addPaperName="";
+                          this.addTime="";
+                          this.selectDepartValue=[];
+                          this.addState="0";
+
+                   }
+                })
+                .catch((err)=>{
+                   this.$alert("数据加载异常",'提示');
+
+                })
+                this.dialogVisible = false;
             },
             handleClose () {
                 this.dialogVisible = false;
                 this.addPaperName="";
                 this.addTime="";
-                this.addState=false;
+                this.addState="0";
             },
             handleEdit (row) {
                 // 编辑试卷
                 console.log(row)
-                this.addPaperName=row.paperName;
-                this.addTime=[new Date(row.startDate),new Date(row.endDate)];
-                this.addState=row.state;
-
+                this.addPaperName=row.examName;
+                this.addTime=[new Date(row.effectiveBeginTime),new Date(row.effectiveEndTime)];
+                this.addState=row.flag;
+                this.paperId=row.examNumber
                 this.editPaper=true;
+                fetch("/question/listByExamId",{examNumber:row.examNumber})
+                .then((res)=>{
+                    if(res.code===0){
+                        this.paperQueTableData=res.data;
+
+                    }
+                    this.$alert(res.msg,'提示')
+                })
+                .catch((err)=>{
+                   console.log(err)
+                   this.$alert("数据加载异常","提示")
+                })
             },
             handleDelete () {
                 // 删除试卷
@@ -691,6 +705,16 @@
                     endTime:this.time?moment(this.time[1]).format('YYYY-MM-DD'):""
                 }
                 console.log(par)
+            },
+            getData () {
+               fetch("/examination/list",{examName:this.paperName})
+               .then((res)=>{
+                    //this.setPapers(res.data)
+                    this.tableData=res.data;
+               })
+               .catch((err)=>{
+                  this.$alert("数据加载异常", "提示")
+               })
             }
         }
     }
