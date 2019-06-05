@@ -75,15 +75,28 @@
     .modify-classify{
         width:100%;
     }
+    .classify-set{
+        height:300px;
+        overflow: auto;
+    }
+    .btn-sure{
+        float: right;
+    }
+    .input-classify{
+        margin-right: 110px;
+    }
 }
 </style>
 <template>
-    <section class="input-question">
+    <section class="input-question"  v-loading="loading" element-loading-text="数据加载中......">
         <el-tabs v-model="activeName" class="tab-container" @tab-click="modifyFlag=(activeName!=='first')">
             <el-tab-pane label="试题录入" name="first">
-                <section class="tips">录入试题 <span>（1. 试题中填答案部分请用 $ 代替；录入试题后将光标移除，2. 若试题中有 $ ，则可录入答案）</span></section>
+                <section class="tips">
+                    录入试题
+                    <span>（1. 试题中填答案部分请用 $ 代替；2. 录入试题后将光标移除，若试题中有 $ ，则可录入答案）</span>
+                </section>
                 <section class="classify">
-                    <el-select v-model="classifyValue" :clearable="true" :filterable="true" placeholder="请选择试题类型">
+                    <el-select v-model="classifyValue" :clearable="true" :filterable="true" placeholder="请选择试题类型（选填）">
                         <el-option
                                 v-for="(item,k) in questionsType"
                                 :key="k"
@@ -91,7 +104,7 @@
                                 :value="item.value">
                         </el-option>
                     </el-select>
-                    <el-button type="primary" @click="dialogVisible = true">创建试题类型</el-button>
+                    <el-button type="primary" @click="dialogVisible = true">维护试题类型</el-button>
                 </section>
                 <section class="input">
                     <el-input
@@ -104,13 +117,16 @@
                     >
                     </el-input>
                 </section>
-                <section class="tips">录入答案 <span> （1.答案顺序为 $ 在试题中顺序；2.答题时，若答案位置可互换，请选择相同组号，3. 录入答案不能出现符号）</span></section>
+                <section class="tips">
+                    录入答案
+                    <span> （1.答案顺序为 $ 在试题中顺序；2.答题时，若答案位置可互换，请选择相同组号，3. 录入答案不能出现符号）</span>
+                </section>
                 <section class="answer-list" v-for="(item,index) in answer" :key="index">
                     <section class="head">
                         <section>
-                    <span>
-                        答案位置是否可换
-                    </span>
+                            <span>
+                                答案位置是否可换
+                            </span>
                             <el-switch
                                     v-model="item.t"
                                     :width=50
@@ -121,9 +137,9 @@
                             </el-switch>
                         </section>
                         <section>
-                    <span v-if="item.t">
-                        选择组号
-                    </span>
+                            <span v-if="item.t">
+                                选择组号
+                            </span>
                             <el-select  v-if="item.t" class="group" v-model="item.group" placeholder="请选择">
                                 <el-option
                                         v-for="(m,j) in groupOptions"
@@ -216,13 +232,47 @@
             </el-tab-pane>
         </el-tabs>
         <el-dialog
-                :title="modifyFlag ? '修改试题类型':'创建试题类型'"
+                :title="modifyFlag ? '修改试题类型':'维护试题类型'"
                 :visible.sync="dialogVisible"
-                top="20%"
+                :top="modifyFlag?'20%':'10%'"
                 width="500"
                 :before-close="handleClose"
         >
-            <el-input v-if="!modifyFlag" v-model="createClassify" placeholder="请输入内容"></el-input>
+            <section v-if="!modifyFlag" class="classify-set">
+                <section>
+                    <el-button type="primary" class="btn-sure" @click="handlePost">新增类型</el-button>
+                    <section class="input-classify">
+                        <el-input  v-model="createClassify" placeholder="请输入内容"></el-input>
+                    </section>
+                </section>
+                <section>
+                    <el-table
+                            :data="questionsType"
+                            tooltip-effect="dark"
+                            style="width: 100%"
+                    >
+                        <el-table-column
+                                prop="label"
+                                label="类型"
+                                align="center"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                label="操作"
+                                width="180"
+                                align="center"
+                        >
+                            <template slot-scope="scope">
+                                <el-button
+                                        plain
+                                        size="mini"
+                                        type="warning"
+                                        @click="handleDeleteClassify(scope.row)">修改</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </section>
+            </section>
             <el-select v-else class="modify-classify" v-model="modifyClassify" :clearable="true" :filterable="true" placeholder="请选择试题类型">
                 <el-option
                         v-for="(item,i) in questionsType"
@@ -231,7 +281,7 @@
                         :value="item.value">
                 </el-option>
             </el-select>
-            <span slot="footer" class="dialog-footer">
+            <span slot="footer" class="dialog-footer" v-if="modifyFlag">
                 <el-button @click="handleClose">取 消</el-button>
                 <el-button type="primary" @click="handlePost">确 定</el-button>
             </span>
@@ -366,6 +416,7 @@
                 ],
                 multipleSelection:[],
                 selectClassifyValue:"",
+                loading:false
             }
         },
         mounted () {
@@ -374,7 +425,9 @@
             ...mapState(['questionsType']),
         },
         methods:{
-
+            handleDeleteClassify () {
+                // 删除试题类型
+            },
             formatterQuestion (row) {
                 console.log(row)
                 return row.question+row.type;

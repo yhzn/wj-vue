@@ -7,10 +7,22 @@ html,body,#app{
     overflow-x: auto;
 }
 .ph-container{
+    display: none;
     height:100%;
     width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+}
+.ph-layout{
+    display: none;
+}
+@media screen and (max-width:767px){
+    .ph-container{
+        display: block;
+    }
+    .ph-layout{
+        display: block;
+    }
 }
 .el-switch__label--left {
     position: relative;

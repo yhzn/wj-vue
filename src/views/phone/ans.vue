@@ -262,8 +262,7 @@
                     }
                     _this.inputData(this);
                 })
-            }
-            if (isIOS) {
+            } else {
                 queStr.on('keyup','input',function(e){
                     let ev=e||window.ev;
                     if(ev.keyCode!==8){
