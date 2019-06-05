@@ -85,8 +85,10 @@
     </section>
 </template>
 <script>
-    import {validate} from "../../validate/validator";
-    import {getCookie,setCookie} from "../../tool/tool";
+    import {validate} from "@/validate/validator";
+    import {getCookie,setCookie} from "@/tool/tool";
+    import fetch from '@/config/fetch'
+    import {baseUrl} from '@/config/env'
     export default {
         data () {
             return {
@@ -117,15 +119,29 @@
         },
         methods:{
             submit () {
+                let par={
+                    staffName:this.user,
+                    staffNumber:this.userNum
+                }
                 if(!validate({ctx:this,rules:this.v})){
                     return false;
                 }
+                console.log(121212)
+                fetch("/login/getStaffToken",par,'POST')
+                .then((res)=>{
+                     if(res.code===0){
+                          setCookie('phUserInfo',JSON.stringify({
+                              user:this.user,
+                              userNum:this.userNum
+                          }));
+                          setCookie('phToken',JSON.stringify(res.data));
+                          this.$router.push('/phlayout/phtestlist');
+                     }else{
+                        alert(res.msg,'提示');
+                     }
+
+                })
                 console.log("校验通过");
-                setCookie('phUserInfo',JSON.stringify({
-                    user:this.user,
-                    userNum:this.userNum
-                }));
-                this.$router.push('/phlayout/phtestlist');
 
             }
         }

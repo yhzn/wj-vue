@@ -105,7 +105,7 @@
 <script>
     import fetch from '@/config/fetch'
     import $ from 'jquery'
-    import {trim,getUrlParam} from "../../tool/tool";
+    import {trim,getUrlParam,getCookie} from "../../tool/tool";
 
     export default {
     data () {
@@ -130,6 +130,8 @@
             cur:0,
             page:'q',
             btnLoad:false,
+            paperId: getUrlParam('id'),
+
         }
     },
     computed:{
@@ -156,7 +158,7 @@
         },
     },
     mounted () {
-        console.log(getUrlParam('id'))
+
         this.getData();
         this.setInput();
     },
@@ -317,8 +319,9 @@
         },
         // 获取问卷
         getData () {
-            fetch('data.json',{id:1,user:"user"})
+            fetch('/question/listForMobile',{examNumber:this.paperId},'post',JSON.parse(getCookie('phToken')))
                 .then((res)=>{
+                console.log(res)
                     this.tempArr=res;
                     this.allQuestion=this.tempArr.length;
                     this.initQuestionIndex();
