@@ -81,3 +81,31 @@ export let getUrlParam = function (name) {
 export let trim = (str) => {
     return str.replace(/\s|\xA0/g,"");
 }
+
+// 答案拼接
+export let formatterQuestion = (row) => {
+    // let arr=[];
+    let str="";
+    let questionList=row.question.split('$');
+    let answerList=row.answers;
+    for(let i=0;i<questionList.length;i++){
+        // arr.push(questionList[i])
+        // if(i <= answerList.length-1){
+        //     arr.push(answerList[i]);
+        // }
+        str+=questionList[i]+(i <= answerList.length-1 ? " （ " +answerList[i]+ " ） ":'');
+    }
+    return str;
+}
+
+// 清除 element-ui 缓存
+
+
+    export let cleanTableCache = (ctx,obj,data) => {
+        ctx[obj]=[];
+        ctx[obj+"timer"]=setTimeout(()=>{
+            clearTimeout(ctx[obj+"timer"]);
+            ctx[obj]=data;
+
+        },0)
+    }

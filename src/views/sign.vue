@@ -171,6 +171,7 @@
 <script>
     import {validate} from "@/validate/validator";
     import {getCookie,setCookie,clone,countDown} from "../tool/tool";
+    import fetch from '@/config/fetch'
     let signInRules={
         user:{
             required:true,
@@ -187,7 +188,7 @@
         }
 
     }
-    let v={
+    let v_1={
         user:{
             required:true,
             input:'user',
@@ -233,6 +234,37 @@
             tips:'',
         }
     }
+    let v_2={
+        user:{
+            required:true,
+            input:'user',
+            name:'用户名',
+            tips:""
+        },
+        phoneNum:{
+            required:true,
+            mobile:true,    // 是否校验数据格式
+            input:'phoneNum',
+            name:'手机号码',
+            tips:''
+        },
+        code:{
+            input:'code',
+            name:'验证码',
+            tips:''
+        },
+        password:{
+            input:'password',
+            name:'密码',
+            tips:''
+        },
+        surePassword:{
+            input:'surePassword',
+            name:'验证密码',
+            customizeTip:true,
+            tips:'',
+        }
+    }
 
     export default {
         data () {
@@ -243,7 +275,7 @@
                 code:'',
                 password:'',
                 surePassword:'',
-                v:clone(v),
+                v:clone(v_2),
                 signInRules:clone(signInRules),
                 btnText:"获取验证码",
             }
@@ -268,52 +300,92 @@
             resetV (page) {
                 if(!page){
                     let userInfo=JSON.parse(getCookie('userInfo'));
+                    console.log(userInfo)
                     if(!!userInfo){
                         this.user=userInfo.user;
                         this.password=userInfo.password;
                     }
                     this.signInRules=clone(signInRules);
                 }else{
-                    this.v=clone(v);
+                    this.v=clone(v_1);
                 }
             },
             getCode () {
+                this.v=clone(v_2)
+                if(!validate({ctx:this,rules:this.v})){
+                    return false;
+                }
                 countDown(this,'btnText',()=>{
-                    console.log(12);
+                    fetch("/verifyCode/sendCode",{
+                        account:this.user,
+                        phoneNumber:this.phoneNum
+                    },"post")
+                    .then((res)=>{
+                        if(res.code!==0){
+                            this.$alert(res.msg,"提示重复")
+                        }
+                    })
+                    .catch(()=>{
+                        this.$alert("短信发送异常","提示")
+                    })
                 })
             },
             signIn () {
                 let par={
-                    user:this.user,
-                    phoneNum:this.password,
+                    account:this.user,
+                    password:this.password,
                 }
                 if(!validate({ctx:this,rules:this.signInRules})){
                     return false;
                 }
-                console.log("校验通过");
-                console.log(par)
-                setCookie('userInfo',JSON.stringify({
-                    user:this.user,
-                    password:this.password
-                }))
-                this.$router.push('/layout/home');
+                fetch("/login/getUserToken",par,"post")
+                    .then((res)=>{
+                        if(res.code===0){
+                            setCookie('userInfo',JSON.stringify({
+                                user:this.user,
+                                password:this.password
+                            }),90)
+                            setCookie("pcToken",JSON.stringify(res.data))
+                            this.$router.push('/layout/home');
+                        }else{
+                            this.$alert(res.msg,"提示");
+                        }
+                    })
+                    .catch(()=>{
+                        this.$alert("数据加载异常","提示");
+                    })
+
+
             },
             submit () {
-                let par={
-                        user:this.user,
-                        phoneNum:this.phoneNum,
-                        code:this.code,
-                        password:this.password,
-
-                    }
-
+                this.v=clone(v_1);
                 if(!validate({ctx:this,rules:this.v})){
                     return false;
                 }
-                console.log("校验通过")
-                console.log(par)
-                this.$router.go(-1)
+                fetch("/verifyCode/updatePassword",{
+                    account:this.user,
+                    phoneNumber:this.phoneNum,
+                    verifyCode:this.code,
+                    newPassword:this.password,
+                    confirmPassword:this.surePassword
+                },'post')
+                    .then((res)=>{
+                        if(res.code===0){
+                            this.$confirm('密码修改成功，返回登录界面', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'success'
+                            }).then(() => {
+                                this.$router.go(-1)
+                            });
 
+                        }else{
+                            this.$alert(res.msg,"提示");
+                        }
+                    })
+                    .catch(()=>{
+                        this.$alert("数据加载异常","提示");
+                    })
             }
         }
     }

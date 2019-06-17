@@ -85,6 +85,17 @@
     .input-classify{
         margin-right: 110px;
     }
+    #pane-second{
+        margin: 0;
+        height:100%;
+        overflow: hidden;
+        .mark-scroll{
+            height:100%;
+            padding: 0 20px;
+            overflow: auto;
+        }
+    }
+
 }
 </style>
 <template>
@@ -96,12 +107,17 @@
                     <span>（1. 试题中填答案部分请用 $ 代替；2. 录入试题后将光标移除，若试题中有 $ ，则可录入答案）</span>
                 </section>
                 <section class="classify">
-                    <el-select v-model="classifyValue" :clearable="true" :filterable="true" placeholder="请选择试题类型（选填）">
+                    <el-select
+                            v-model="classifyValue"
+                            :clearable="true"
+                            :filterable="true"
+                            placeholder="请选择试题类型（选填）"
+                    >
                         <el-option
                                 v-for="(item,k) in questionsType"
                                 :key="k"
-                                :label="item.label"
-                                :value="item.value">
+                                :label="item.questionTypeName"
+                                :value="item.questionTypeNumber">
                         </el-option>
                     </el-select>
                     <el-button type="primary" @click="dialogVisible = true">维护试题类型</el-button>
@@ -160,79 +176,82 @@
                         </el-input>
                     </section>
                 </section>
-                <el-button v-if="answer.length!==0" type="primary" @click="submit">提 交</el-button>
+                <el-button class="btn-sure" v-if="answer.length!==0" type="primary" @click="submit">提 交</el-button>
 
             </el-tab-pane>
             <el-tab-pane label="试题修改" name="second">
-                <section class="search-bar">
-                    <el-select v-model="selectClassifyValue" :clearable="true" :filterable="true" @change="classifyChange" placeholder="请选择试题类型">
-                        <el-option
-                                v-for="(item,j) in  questionsType"
-                                :key="j"
-                                :label="item.label"
-                                :value="item.value">
-                        </el-option>
-                    </el-select>
-                    <el-button type="danger" @click="mulDelete"><i class="el-icon-delete"></i> 批量删除</el-button>
+                <section class="mark-scroll">
+                    <section class="search-bar">
+                        <el-select v-model="selectClassifyValue" :clearable="true" :filterable="true" @change="classifyChange" placeholder="请选择试题类型">
+                            <el-option
+                                    v-for="(item,j) in  questionsType"
+                                    :key="j"
+                                    :label="item.questionTypeName"
+                                    :value="item.questionTypeNumber">
+                            </el-option>
+                        </el-select>
+                        <el-button type="danger" @click="mulDelete"><i class="el-icon-delete"></i> 批量删除</el-button>
+                    </section>
+                    <el-table
+                            ref="multipleTable"
+                            :data="testTableData"
+                            tooltip-effect="dark"
+                            style="width: 100%"
+                            row-key="questionNumber"
+                            @selection-change="handleSelectionChange">
+                        <el-table-column
+                                type="selection"
+                                width="30"
+                                align="center"
+
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                label=" "
+                                width="80"
+                                type="index"
+                                align="center"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                prop="question"
+                                label="试题"
+                        >
+                            <template slot-scope="scope">
+                                <formatter-question :row="scope.row"></formatter-question>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="typeName"
+                                label="类型"
+                                width="200"
+                                align="center"
+                        >
+                        </el-table-column>
+                        <el-table-column
+                                label="操作"
+                                width="180"
+                                align="center"
+                        >
+                            <template slot-scope="scope">
+                                <el-button
+                                        plain
+                                        size="mini"
+                                        @click="handleEdit(scope.row)">修改类型</el-button>
+                                <el-button
+                                        plain
+                                        size="mini"
+                                        type="danger"
+                                        @click="handleDelete(scope.row)">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
                 </section>
-                <el-table
-                        ref="multipleTable"
-                        :data="testTableData"
-                        tooltip-effect="dark"
-                        style="width: 100%"
-                        @selection-change="handleSelectionChange">
-                    <el-table-column
-                            type="selection"
-                            width="30"
-                            align="center"
 
-                    >
-                    </el-table-column>
-                    <el-table-column
-                            label=" "
-                            width="30"
-                            type="index"
-                            align="center"
-
-                    >
-                    </el-table-column>
-                    <el-table-column
-                            prop="question"
-                            label="试题"
-                    >
-                        <template slot-scope="scope">
-                            {{formatterQuestion(scope.row)}}
-                        </template>
-                    </el-table-column>
-                    <el-table-column
-                            prop="type"
-                            label="类型"
-                            width="200"
-                            align="center"
-                    >
-                    </el-table-column>
-                    <el-table-column
-                            label="操作"
-                            width="180"
-                            align="center"
-                    >
-                        <template slot-scope="scope">
-                            <el-button
-                                    plain
-                                    size="mini"
-                                    @click="handleEdit(scope.$index, scope.row)">修改类型</el-button>
-                            <el-button
-                                    plain
-                                    size="mini"
-                                    type="danger"
-                                    @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
             </el-tab-pane>
         </el-tabs>
         <el-dialog
-                :title="modifyFlag ? '修改试题类型':'维护试题类型'"
+                :title="modifyFlag ? '修改试题类型':'试题类型维护'"
                 :visible.sync="dialogVisible"
                 :top="modifyFlag?'20%':'10%'"
                 width="500"
@@ -252,7 +271,7 @@
                             style="width: 100%"
                     >
                         <el-table-column
-                                prop="label"
+                                prop="questionTypeName"
                                 label="类型"
                                 align="center"
                         >
@@ -267,7 +286,7 @@
                                         plain
                                         size="mini"
                                         type="warning"
-                                        @click="handleDeleteClassify(scope.row)">修改</el-button>
+                                        @click="handleChangeClassify(scope.row)">修改</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -277,8 +296,8 @@
                 <el-option
                         v-for="(item,i) in questionsType"
                         :key="i"
-                        :label="item.label"
-                        :value="item.value">
+                        :label="item.questionTypeName"
+                        :value="item.questionTypeNumber">
                 </el-option>
             </el-select>
             <span slot="footer" class="dialog-footer" v-if="modifyFlag">
@@ -292,6 +311,9 @@
     import {mapState,mapActions} from 'vuex'
     import {trim} from "@/tool/tool";
     import fetch from '@/config/fetch'
+    import formatterQuestion from "@/components/formatter-question";
+    import {getCookie} from "../tool/tool";
+
     export default {
         data () {
             return {
@@ -371,108 +393,137 @@
                 ],
                 groupValue:"",
                 question:"",
+                questionId:null,
                 answer: [],
                 classifyValue:"",
                 modifyClassify:"",
                 dialogVisible:false,
                 createClassify:"",
-                testTableData: [
-                    {
-                        id:1,
-                        typeId:1,
-                        type:"类型1",
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:1,
-                        typeId:1,
-                        type:"类型2",
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:1,
-                        typeId:1,
-                        type:"类型3",
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:1,
-                        typeId:1,
-                        type:"类型4",
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:1,
-                        typeId:1,
-                        type:"类型5",
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:1,
-                        typeId:1,
-                        type:"类型6",
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                ],
+                testTableData: [],
                 multipleSelection:[],
                 selectClassifyValue:"",
-                loading:false
+                loading:false,
+                filterClassify:"",
             }
         },
         mounted () {
+            this.getQuestionList()
         },
         computed:{
             ...mapState(['questionsType']),
         },
+        components:{
+            formatterQuestion
+        },
         methods:{
-            handleDeleteClassify () {
-                // 删除试题类型
-            },
-            formatterQuestion (row) {
-                console.log(row)
-                return row.question+row.type;
-            },
             ...mapActions(['setQuestionsType']),
-            classifyChange (v) {
-                console.log(v)
+            getQuestionList (par="") {
+                fetch('/question/list',{typeNumber:par},'post',JSON.parse(getCookie("pcToken")))
+                    .then((res)=>{
+                        if(res.code===0){
+                            this.testTableData=res.data;
+                        }else{
+                            this.$alert(res.msg,"提示")
+                        }
+                    })
+                    .catch((err)=>{
+                        this.$alert("数据加载异常","提示")
+                    })
             },
-            handleEdit () {
+            handleChangeClassify (row) {
+                // 修改试题类型
+                this.$prompt('请输入类型', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputPattern: /^.+$/,
+                    inputErrorMessage: '类型不能为空'
+                }).then(({ value }) => {
+                    fetch('/question/modifyQuestionTypeName',{questionTypeName:value,questionTypeNumber:row.questionTypeNumber},'post',JSON.parse(getCookie("pcToken")))
+                        .then((res)=>{
+                            if(res.code===0){
+                                this.getQuestionTypeList();
+                                this.getQuestionList(this.filterClassify)
+
+                            }else{
+                                this.$alert(res.msg,"提示")
+                            }
+                        })
+                        .catch(()=>{
+                            this.$alert("数据加载异常","提示")
+                        })
+
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消修改'
+                    });
+                });
+
+            },
+            classifyChange (v) {
+                this.filterClassify=v;
+                this.getQuestionList(v)
+            },
+            handleEdit (row) {
                 // 修改类型
+                this.modifyClassify=row.typeNum;
+                this.questionId=row.questionNumber;
                 this.dialogVisible=true;
             },
-            handleDelete () {
+            handleDelete (row) {
                 // 删除
                 this.$confirm('此操作将从题库中删除此试题, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
+                    this.deleteData([row.questionNumber]);
                 }).catch(() => {
                     this.$message({
                         type: 'info',
                         message: '已取消删除'
                     });
                 });
+            },
+            deleteData (arr=[]) {
+                fetch('/question/del',{ids:arr},'post',JSON.parse(getCookie("pcToken")))
+                    .then((res)=>{
+                        if(res.code===0){
+                            this.getQuestionList(this.filterClassify);
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                        }else{
+                            this.$message({
+                                type: 'info',
+                                message: res.msg
+                            });
+                        }
+                    })
+                    .catch(()=>{
+                        this.$alert("数据加载异常","提示")
+                    })
 
             },
             mulDelete () {
                 // 批量删除
+
+                if(this.multipleSelection.length===0){
+                    this.$alert("请选择要删除的试题","提示");
+                    return false;
+                }
                 this.$confirm('此操作将从题库删除选中试题, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    console.log(this.multipleSelection)
-                    this.$refs.multipleTable.clearSelection();
 
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
+                    let arr=this.multipleSelection.map((item,index)=>{
+                        return item.questionNumber;
+                    })
+                    this.deleteData(arr);
+                    this.$refs.multipleTable.clearSelection();
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -483,23 +534,45 @@
             handlePost () {
                 if(this.modifyFlag){
                     //修改类型
-                    console.log(this.modifyClassify)
+                    fetch('/question/modifyQuestionType',{typeNumber:this.modifyClassify,questionNumber:this.questionId},'post',JSON.parse(getCookie("pcToken")))
+                        .then((res)=>{
+                            if(res.code===0){
+                                this.getQuestionList(this.filterClassify)
+                                this.dialogVisible = false;
+
+                            }else{
+                                this.$alert(res.msg,"提示");
+                            }
+                        })
+                        .catch(()=>{
+                            this.$alert("数据加载异常","提示");
+                        })
                 }else{
                     // 创建类型
-                    let data=[
-                        {value:"1",label:"试题类型2"},
-                        {value:"1",label:"试题类型2"},
-                        {value:"1",label:"试题类型2"},
-                        {value:"1",label:"试题类型2"}
-                    ]
-
-                    this.setQuestionsType(data);
-                    this.dialogVisible = false;
+                    fetch("/question/saveQuestionType",{questionTypeName:this.createClassify},'post',JSON.parse(getCookie("pcToken")))
+                        .then((res)=>{
+                            if(res.code===0){
+                                this.getQuestionTypeList();
+                            }else{
+                                this.$alert(res.msg);
+                            }
+                        })
+                        .catch(()=>{
+                            this.$alert("数据加载异常","提示")
+                        })
                     this.createClassify="";
-                    this.$alert('提交成功','提示')
                 }
+            },
+            getQuestionTypeList () {
+                fetch("/question/questionTypeList",{},'get',JSON.parse(getCookie("pcToken")))
+                    .then((res)=>{
+                        if(res.code===0){
+                            this.setQuestionsType(res.data);
 
-
+                        }else{
+                            this.$alert(res.msg)
+                        }
+                    })
             },
             handleClose () {
                 this.dialogVisible = false;
@@ -512,7 +585,7 @@
                 let regEn = /[`!@#$%^&*()_+<>?:"{},.\/;'[\]]/im,
                     regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】[\]]/im;
                 if(regEn.test(item.val) || regCn.test(item.val)) {
-                    this.$alert('输入答案不能为空且不能有符号有符号', '标题名称');
+                    this.$alert('输入答案不能为空 且不能有符号', '标题名称');
                     return true;
                 }
                 let val=trim(item.val);
@@ -543,15 +616,13 @@
                 }
             },
             submit(){
+                let regEn = /[`!@#$%^&*()_+<>?:"{},.\/;'[\]]/im,
+                    regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】[\]]/im;
                 let v=this.answer.some((item,index)=>{
-
-                    let regEn = /[`!@#$%^&*()_+<>?:"{},.\/;'[\]]/im,
-                        regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】[\]]/im;
                     return !item.val || regEn.test(item.val) || regCn.test(item.val)
-
                 })
                 if(v){
-                    this.$alert('输入答案不能为空且不能有符号有符号', '标题名称');
+                    this.$alert('输入答案不能为空且不能有符号', '标题名称');
                     return false;
 
                 }
@@ -559,32 +630,27 @@
                     return item.t && !item.group;
                 })
                 if(f){
-                    alert("请选择组号");
+                    this.$alert("请选择组号");
                     return false;
                 }
                 let par={
-                    classify:this.classifyValue,
+                    typeNumber:this.classifyValue,
                     question:this.question,
                     answer:this.answer
                 }
-                fetch('/question/save',par,'post')
+                fetch('/question/save',par,'post',JSON.parse(getCookie("pcToken")))
                 .then((res)=>{
+                    if(res.code===0){
+                        this.getQuestionList(this.filterClassify)
 
+                    }else{
+                        this.$alert(res.msg,"提示")
+
+                    }
                 })
                 .catch((err)=>{
-
+                    this.$alert("数据加载异常","提示")
                 })
-                console.log(par)
-                // fetch('http://192.168.17.168:8080/question/saveQuestion',par,"POST")
-                //     .then((res)=>{
-                //         // this.tempArr[this.cur].state=true;
-                //         // this.nextQuestion();
-                //         // this.btnLoad=false;
-                //     })
-                //     .catch((err) => {
-                //         // alert("数据加载异常");
-                //         // this.btnLoad=false;
-                //     })
                 this.question="";
                 this.answer=[]
 

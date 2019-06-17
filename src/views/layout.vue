@@ -89,7 +89,7 @@
                 考试管理系统
             </p>
             <ul>
-                <li>管理员</li>
+                <li>{{admin}}</li>
                 <li @click="() => {this.$router.push('/')}"></li>
             </ul>
         </header>
@@ -117,7 +117,7 @@
                         <span slot="title">考试查询</span>
                     </el-menu-item>
                     <el-menu-item index="personnelmanagement">
-                        <span slot="title">人员管理</span>
+                        <span slot="title">人员维护</span>
                     </el-menu-item>
                     <!--<el-submenu index="1">-->
                         <!--<template slot="title">-->
@@ -167,19 +167,21 @@
 </template>
 <script>
     import {mapMutations,mapActions} from 'vuex'
+    import {getCookie} from "../tool/tool";
+    import fetch from '@/config/fetch'
     export default {
         data () {
             return {
-                user:"",
+                admin:JSON.parse(getCookie('userInfo')).user,
                 title:"",
                 menuHighlight:window.location.hash.replace("#/layout/","").replace("?","/").split("/")[0],
             }
         },
         mounted () {
-            console.log(123)
+            // console.log(123)
             this.getDepartments();
             this.getQuestionsType();
-            this.getPapers();
+            // this.getPapers();
         },
         methods:{
             // ...mapMutations(['setDepartments']),
@@ -190,38 +192,32 @@
                 // console.log(par)
             },
             getQuestionsType () {
-                let data=[
-                    {value:"1",label:"试题类型1"},
-                    {value:"2",label:"试题类型1"},
-                    {value:"3",label:"试题类型1"},
-                    {value:"4",label:"试题类型1"}
-                    ]
+                fetch("/question/questionTypeList",{},'get',JSON.parse(getCookie("pcToken")))
+                    .then((res)=>{
+                        if(res.code===0){
+                            this.setQuestionsType(res.data);
+
+                        }else{
+                            this.$alert(res.msg)
+                        }
+                    })
+
                 // this.$store.commit('setDepartments',data)
                 // this.$store.dispatch('setDepartments',data)
-                this.setQuestionsType(data);
+                // this.setQuestionsType(data);
             },
             getDepartments () {
                 let data=[
-                    {value:"1",label:"科室1"},
-                    {value:"2",label:"科室2"},
-                    {value:"3",label:"科室3"},
-                    {value:"4",label:"科室4"},
-                    {value:"5",label:"科室5"},
-                    {value:"6",label:"科室6"}
+                    // {value:"1",label:"科室1"},
+                    // {value:"2",label:"科室2"},
+                    // {value:"3",label:"科室3"},
+                    // {value:"4",label:"科室4"},
+                    // {value:"5",label:"科室5"},
+                    // {value:"6",label:"科室6"}
                 ]
                 this.setDepartments(data);
             },
-            getPapers () {
-                let data=[
-                    {value:"1",label:"试卷1"},
-                    {value:"2",label:"试卷2"},
-                    {value:"3",label:"试卷3"},
-                    {value:"4",label:"试卷4"},
-                    {value:"5",label:"试卷5"},
-                    {value:"6",label:"试卷6"}
-                ]
-                this.setPapers(data)
-            }
+
 
         }
     }

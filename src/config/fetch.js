@@ -5,7 +5,7 @@ import {
 export default async(url = '', data = {}, type = 'GET', token='',method = 'fetch') => {
     type = type.toUpperCase();
     url = baseUrl + url;
-
+    // data.setTimeStamp=new Date().getTime();
     if (type == 'GET') {
         let dataStr = ''; //数据拼接字符串
         Object.keys(data).forEach(key => {
@@ -27,7 +27,8 @@ export default async(url = '', data = {}, type = 'GET', token='',method = 'fetch
                 'Token':token,
             },
             mode: "cors",
-            cache: "force-cache"
+            cache: "no-store" // 去缓存
+            // cache: "force-cache"
         }
 
         if (type == 'POST') {
@@ -58,7 +59,8 @@ export default async(url = '', data = {}, type = 'GET', token='',method = 'fetch
             }
 
             requestObj.open(type, url, true);
-            requestObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            requestObj.setRequestHeader("Content-type", "application/json");
+            // requestObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             requestObj.setRequestHeader("Token",token);
             requestObj.send(sendData);
 

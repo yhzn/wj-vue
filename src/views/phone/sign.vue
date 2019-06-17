@@ -112,6 +112,7 @@
         },
         mounted () {
            let userInfo=JSON.parse(getCookie('phUserInfo'));
+           console.log(userInfo)
            if(!!userInfo){
                this.user=userInfo.user;
                this.userNum=userInfo.userNum;
@@ -133,7 +134,7 @@
                           setCookie('phUserInfo',JSON.stringify({
                               user:this.user,
                               userNum:this.userNum
-                          }));
+                          }),90);
                           setCookie('phToken',JSON.stringify(res.data));
                           this.$router.push('/phlayout/phtestlist');
                      }else{
@@ -141,7 +142,9 @@
                      }
 
                 })
-                console.log("校验通过");
+                    .catch(()=>{
+                        alert("数据加载异常")
+                    })
 
             }
         }

@@ -24,6 +24,10 @@ html,body,#app{
         display: block;
     }
 }
+
+
+
+/*element 组件样式修改*/
 .el-switch__label--left {
     position: relative;
     margin-right: 7px;
@@ -87,4 +91,9 @@ html,body,#app{
 }
 .tab-container .el-tab-pane{
     margin: 0 20px;
+}
+
+/*颜色*/
+.red{
+    color:#ff0000;
 }

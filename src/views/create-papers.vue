@@ -100,14 +100,15 @@
             <nav>
                 <ul class="clearfix">
                     <li>
-                        <el-select v-model="paperName"  :clearable="true" :filterable="true" placeholder="请选择试卷">
-                            <el-option
-                                    v-for="item in papers"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                            </el-option>
-                        </el-select>
+                        <el-input  v-model="paperName" placeholder="请输入试卷名称"></el-input>
+                        <!--<el-select v-model="paperName"  :clearable="true" :filterable="true" placeholder="请选择试卷">-->
+                            <!--<el-option-->
+                                    <!--v-for="item in papers"-->
+                                    <!--:key="item.value"-->
+                                    <!--:label="item.label"-->
+                                    <!--:value="item.value">-->
+                            <!--</el-option>-->
+                        <!--</el-select>-->
                     </li>
                     <li>
                         <el-date-picker
@@ -133,6 +134,7 @@
                     <el-table
                             :data="tableData"
                             stripe
+                            row-key="examNumber"
                             style="width: 100%">
                         <el-table-column
                                 prop="examName"
@@ -144,40 +146,44 @@
                                 prop="effectiveBeginTime"
                                 label="开始日期"
                                 align="center"
-                                width="130">
+                                width="160">
                         </el-table-column>
                         <el-table-column
                                 prop="effectiveEndTime"
                                 label="结束日期"
                                 align="center"
-                                width="130">
+                                width="160">
                         </el-table-column>
                         <el-table-column
                                 label="是否使用"
                                 align="center"
-                                width="130"
+                                width="90"
                         >
                             <template slot-scope="scope">
-                                <el-switch
-                                        v-model="scope.row.flag"
-                                        :width=50
-                                        active-value="1"
-                                        inactive-value="0"
-                                        active-text="是"
-                                        inactive-text="否"
-                                        @change="changeState(scope.row)"
-                                >
-                                </el-switch>
+                                <span v-if="scope.row.flag==='1'">
+                                    是
+                                </span>
+                                <span v-else>
+                                    否
+                                </span>
                             </template>
                         </el-table-column>
 
                         <el-table-column
                                 label="详情"
                                 align="center"
-                                width="130">
+                                width="100">
                             <template slot-scope="scope">
                                 <el-popover trigger="hover" placement="top">
-                                    <p>参考科室: <span v-for="(item,index) in scope.row.departments" :key="index">{{item}}</span></p>
+                                    <p>
+                                        考试科室:
+                                        <span
+                                                v-for="(item,index) in scope.row.departments"
+                                                :key="index"
+                                        >
+                                            {{item}}
+                                        </span>
+                                    </p>
                                     <p>试题数量: {{ scope.row.testNum }}</p>
                                     <div slot="reference" class="name-wrapper">
                                         <el-tag size="medium">详情</el-tag>
@@ -208,17 +214,16 @@
         <section class="papers" v-show="editPaper">
             <section class="btn-con">
                 <h1>
-                    全国考卷
+                    {{addPaperName}}
                 </h1>
                 <el-button type="warning" size="mini" @click="dialogVisible=true"><i class="el-icon-edit"></i> 修改初始信息</el-button>
                 <el-button type="success"  size="mini" @click="addQuestion"><i class="el-icon-plus"></i> 添加试题</el-button>
                 <el-button type="danger"  size="mini" @click="deleteQuestion"><i class="el-icon-delete"></i> 删除试题</el-button>
                 <el-button type="primary"  size="mini" @click="back">返 回</el-button>
             </section>
-
             <section class=" edit-paper">
                 <header>
-                    <p>2019-06-01 至 2019-06-29  考试科室：科室1、科室2</p>
+                    <p>有效日期：{{effectiveBeginTime}} 至 {{effectiveEndTime}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;考试科室：******</p>
                 </header>
                 <section class="tab-con">
                     <el-table
@@ -226,6 +231,7 @@
                             :data="paperQueTableData"
                             tooltip-effect="dark"
                             style="width: 100%"
+                            row-key="questionNumber"
                             @selection-change="handleSelectionChange">
                         <el-table-column
                                 type="selection"
@@ -233,13 +239,17 @@
                         </el-table-column>
                         <el-table-column
                                 label=" "
-                                width="30"
+                                width="80"
+                                align="center"
                                 type="index">
                         </el-table-column>
                         <el-table-column
                                 prop="question"
                                 label="试题"
                         >
+                            <template slot-scope="scope">
+                                <formatter-question :row="scope.row"></formatter-question>
+                              </template>
                         </el-table-column>
                     </el-table>
                 </section>
@@ -251,7 +261,7 @@
                 :visible.sync="dialogVisible"
                 top="15%"
                 width="60%"
-                :before-close="handleClose"
+                @before-close="dialogVisible = false"
         >
             <ul>
                 <li>
@@ -278,7 +288,7 @@
                     </section>
                 </li>
                 <li>
-                    <p>科室：</p>
+                    <p>考试科室：</p>
                     <section>
                         <el-select class="select-depart" v-model="selectDepartValue" multiple :clearable="true" placeholder="请选择科室">
                             <el-option
@@ -308,7 +318,7 @@
                 </li>
             </ul>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="handleClose">取 消</el-button>
+                <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="handlePost">确 定</el-button>
              </span>
         </el-dialog>
@@ -322,12 +332,18 @@
         >
            <section class="self-dialog-body">
                <section>
-                   <el-select v-model="classifyValue" :clearable="true" :filterable="true" placeholder="请选择试题类型">
+                   <el-select
+                           v-model="classifyValue"
+                           :clearable="true"
+                           :filterable="true"
+                           placeholder="请选择试题类型"
+                           @change="selectClassify"
+                   >
                        <el-option
                                v-for="(item,i) in questionsType"
                                :key="i"
-                               :label="item.label"
-                               :value="item.value">
+                               :label="item.questionTypeName"
+                               :value="item.questionTypeNumber">
                        </el-option>
                    </el-select>
                </section>
@@ -335,6 +351,7 @@
                        ref="questionMultipleTable"
                        :data="questionTableData"
                        tooltip-effect="dark"
+                       row-key="questionNumber"
                        style="width: 100%"
                        @selection-change="handleSelectionChangeAdd">
                    <el-table-column
@@ -343,12 +360,23 @@
                    </el-table-column>
                    <el-table-column
                            label=" "
-                           width="30"
+                           width="80"
+                           align="center"
                            type="index">
                    </el-table-column>
                    <el-table-column
                            prop="question"
                            label="试题"
+                   >
+                       <template slot-scope="scope">
+                           <formatter-question :row="scope.row"></formatter-question>
+                       </template>
+
+                   </el-table-column>
+                   <el-table-column
+                           prop="typeName"
+                           label="类型"
+                           width="200"
                    >
                    </el-table-column>
                </el-table>
@@ -364,6 +392,9 @@
     import moment from 'moment'
     import {mapState,mapActions} from 'vuex'
     import fetch from '@/config/fetch'
+    import formatterQuestion from "@/components/formatter-question";
+    import {getCookie} from "../tool/tool";
+
     export default {
         data () {
             return {
@@ -372,58 +403,7 @@
                 addPaperName:"",
                 addTime:"",
                 addState:"0",
-                tableData: [
-                    {
-                        id:1,
-                        startDate: '2016-05-02',
-                        endDate: '2016-05-02',
-                        paperName: '全国考卷一',
-                        departments:['科室一','科室二','科室三'],
-                        testNum:10,
-                        state:true,
-
-                    },
-                    {
-                        id:2,
-                        startDate: '2016-05-02',
-                        endDate: '2016-05-02',
-                        paperName: '全国考卷一',
-                        departments:['科室一','科室二','科室三'],
-                        testNum:20,
-                        state:false,
-
-                    },
-                    {
-                        id:3,
-                        startDate: '2016-05-02',
-                        endDate: '2016-05-02',
-                        paperName: '全国考卷一',
-                        departments:['科室一','科室二','科室三'],
-                        testNum:30,
-                        state:false,
-
-                    },
-                    {
-                        id:4,
-                        startDate: '2016-05-02',
-                        endDate: '2016-05-02',
-                        paperName: '全国考卷一',
-                        departments:['科室一','科室二','科室三'],
-                        testNum:40,
-                        state:false,
-
-                    },
-                    {
-                        id:5,
-                        startDate: '2016-05-02',
-                        endDate: '2016-05-02',
-                        paperName: '全国考卷一',
-                        departments:['科室一','科室二','科室三'],
-                        testNum:50,
-                        state:false,
-
-                    },
-                ],
+                tableData: [],
                 pickerOptions: {
                     shortcuts: [{
                         text: '最近一周',
@@ -454,124 +434,29 @@
                 time:'',
                 dialogVisible:false,
                 dialogVisible1:false,
-                testTableData: [
-                    {
-                        id:1,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:2,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:3,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:4,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:5,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:6,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:7,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    }
-                ],
+                testTableData: [],
                 multipleSelection: [],
-                questionTableData: [
-                    {
-                        id:1,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:2,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:3,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:4,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:5,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:6,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    },
-                    {
-                        id:7,
-                        question: '上海市普陀区金沙江路 1518 弄'
-                    }
-                ],
+                questionTableData: [],
                 questionMultipleSelection: [],
                 paperQueTableData:[],
-                classify:[
-                    {
-                        value:"1",
-                        label:"类型1"
-                    },
-                    {
-                        value:"2",
-                        label:"类型2"
-                    },
-                    {
-                        value:"3",
-                        label:"类型3"
-                    },
-                    {
-                        value:"4",
-                        label:"类型4"
-                    },
-                    {
-                        value:"5",
-                        label:"类型5"
-                    },
-                ],
                 classifyValue:"",
-                selectDepartOptions:[
-                    {
-                        value:"1",
-                        label:"科室一"
-                    },
-                    {
-                        value:"2",
-                        label:"科室二"
-                    },
-                    {
-                        value:"3",
-                        label:"科室三"
-                    },
-                    {
-                        value:"4",
-                        label:"科室四"
-                    },
-                    {
-                        value:"5",
-                        label:"科室五"
-                    },
-                ],
                 selectDepartValue:[],
-                paperId:null
+                paperId:null,
+                effectiveBeginTime:null,
+                effectiveEndTime:null,
+                examName:"",
 
-            }
+
+        }
         },
         computed:{
-            ...mapState(['departments','papers','questionsType'])
+            ...mapState(['departments','papers','questionsType']),
         },
         mounted () {
            this.getData();
+        },
+        components:{
+            formatterQuestion
         },
         methods:{
             ...mapActions(['setPapers']),
@@ -589,11 +474,27 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    console.log(this.multipleSelection)
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
+                    let arr=this.multipleSelection.map((item)=>{
+                        return item.questionNumber
+
+                    })
+                    fetch('/examination/delQuestionByExamId',{examNo:this.paperId,questionIds:arr},'post',JSON.parse(getCookie("pcToken")))
+                        .then((res)=>{
+                            if(res.code===0){
+                                this.getExam(this.paperId);
+                                this.getQuestionList(this.classifyValue);
+                                this.$message({
+                                    type: 'success',
+                                    message: '删除成功!'
+                                });
+                            }else{
+                                this.$message({
+                                    type: 'info',
+                                    message: res.msg
+                                });
+
+                            }
+                        })
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -605,10 +506,24 @@
                 this.questionMultipleSelection = val;
             },
             handlePostAdd () {
-                // 取消选择
-                console.log(this.questionMultipleSelection)
+                let arr=this.questionMultipleSelection.map((item)=>{
+                     return item.questionNumber
+                })
                 this.dialogVisible1 = false;
-                this.$refs.questionMultipleTable.clearSelection();
+                fetch('/examination/addQuestionsToExam',{examNo:this.paperId,questionIds:arr},'post',JSON.parse(getCookie("pcToken")))
+                    .then((res)=>{
+                        if(res.code===0){
+                            this.getExam(this.paperId);
+                            this.getQuestionList(this.classifyValue);
+                            this.$refs.questionMultipleTable.clearSelection();
+
+                        }
+                        this.$alert(res.msg)
+                    })
+                    .catch(()=>{
+                        this.$alert("数据加载异常","提示");
+                    })
+
             },
             handleCloseAdd () {
                 this.dialogVisible1 = false;
@@ -643,7 +558,7 @@
                     // 新增试卷
                     url='/examination/save'
                 }
-                fetch(url,par,'post')
+                fetch(url,par,'post',JSON.parse(getCookie("pcToken")))
                 .then((res)=>{
                    this.$alert(res.msg,"提示");
 
@@ -663,35 +578,83 @@
                 })
                 this.dialogVisible = false;
             },
-            handleClose () {
-                this.dialogVisible = false;
-                this.addPaperName="";
-                this.addTime="";
-                this.addState="0";
-            },
             handleEdit (row) {
                 // 编辑试卷
                 console.log(row)
                 this.addPaperName=row.examName;
                 this.addTime=[new Date(row.effectiveBeginTime),new Date(row.effectiveEndTime)];
+                this.effectiveBeginTime=row.effectiveBeginTime;
+                this.effectiveEndTime=row.effectiveEndTime;
                 this.addState=row.flag;
-                this.paperId=row.examNumber
+                this.paperId=row.examNumber;
                 this.editPaper=true;
-                fetch("/question/listByExamId",{examNumber:row.examNumber})
-                .then((res)=>{
-                    if(res.code===0){
-                        this.paperQueTableData=res.data;
-
-                    }
-                    this.$alert(res.msg,'提示')
-                })
-                .catch((err)=>{
-                   console.log(err)
-                   this.$alert("数据加载异常","提示")
-                })
+                this.getExam(row.examNumber);
+                this.getQuestionList(this.classifyValue);
             },
-            handleDelete () {
+            selectClassify (v) {
+                this.classifyValue=v;
+                this.getQuestionList (v);
+            },
+            getQuestionList (typeNumber) {
+                fetch('/examination/getExamQuestionNotExistInExam',{examNumber:this.paperId,typeNumber},'post',JSON.parse(getCookie("pcToken")))
+                    .then((res)=>{
+                         if(res.code===0){
+                             this.questionTableData=res.data;
+                         }else{
+                             this.$alert(res.msg,"提示")
+                         }
+                    })
+                    .catch((err)=>{
+                        this.$alert("数据加载异常","提示")
+
+                    })
+            },
+            getExam (id) {
+                fetch("/question/listByExamNumber",{examNumber:id},'get',JSON.parse(getCookie("pcToken")))
+                    .then((res)=>{
+                        if(res.code===0){
+                            this.paperQueTableData=res.data;
+
+                        }else{
+                            this.$alert(res.msg,'提示')
+                        }
+                    })
+                    .catch((err)=>{
+                        this.$alert("数据加载异常","提示")
+                    })
+            },
+            handleDelete (row) {
                 // 删除试卷
+                this.$confirm('是否删除该试卷?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.deleteExam(row);
+                }).catch((err) => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+
+            },
+            deleteExam (row) {
+                fetch('/examination/del',{examNo:row.examNumber},'get',JSON.parse(getCookie("pcToken")))
+                    .then((res)=>{
+                        if(res.code===0){
+                            this.getData();
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                        }else{
+                            this.$alert(res.msg,"提示");
+                        }
+                    })
+                    .catch((err)=>{
+                        this.$alert("数据加载异常","提示")
+                    })
             },
             changeState (item) {
                 // 修改试卷使用状态
@@ -700,14 +663,14 @@
             search () {
                 // 试卷查询
                 let par={
-                    paperName:this.paperName,
-                    startTime:this.time?moment(this.time[0]).format('YYYY-MM-DD'):"",
-                    endTime:this.time?moment(this.time[1]).format('YYYY-MM-DD'):""
+                    examName:this.paperName,
+                    effectiveBeginTime:this.time?moment(this.time[0]).format('YYYY-MM-DD'):"",
+                    effectiveEndTime:this.time?moment(this.time[1]).format('YYYY-MM-DD'):""
                 }
-                console.log(par)
+                this.getData(par)
             },
-            getData () {
-               fetch("/examination/list",{examName:this.paperName})
+            getData (par) {
+               fetch("/examination/list",par,'post',JSON.parse(getCookie("pcToken")))
                .then((res)=>{
                     //this.setPapers(res.data)
                     this.tableData=res.data;

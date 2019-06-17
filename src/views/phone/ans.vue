@@ -89,12 +89,12 @@
             </section>
             <section class="success" v-else>
                 <ul>
-                    <li>本次共计18道题</li>
-                    <li>开始：2019-05-12 10:30</li>
-                    <li>结束：2019-05-12 10:30</li>
+                    <li>本次共计{{allQuestion}}道题</li>
+                    <li>开始答题时间：{{startAnsTime}}</li>
+                    <li>结束答题时间：{{endAnsTime}}</li>
                     <li>恭喜挑战成功</li>
                 </ul>
-                <el-button class="suc-btn" type="primary"  :loading="btnLoad" @click="setAns">查看已完成答题</el-button>
+                <el-button class="suc-btn" type="primary"  :loading="btnLoad" @click="()=>{this.$router.go(-1)}">返回试卷列表</el-button>
             </section>
         </section>
         <footer>
@@ -112,26 +112,14 @@
         return {
             domStr:"",
             completeDom:"",
-            tempArr:[
-                {
-                    "id":1,
-                    "question":"我*是*谁,你能回答*不",
-                    "answer":{},
-                    "len":[1,1,3]
-                },
-                {
-                    "id":1,
-                    "question":"我*是*谁,你能回答*不",
-                    "answer":{},
-                    "len":[1,2,1]
-                },
-            ],
+            tempArr:[],
             allQuestion:0,
             cur:0,
             page:'q',
             btnLoad:false,
             paperId: getUrlParam('id'),
-
+            startAnsTime:"",
+            endAnsTime:"",
         }
     },
     computed:{
@@ -158,7 +146,7 @@
         },
     },
     mounted () {
-
+        this.getExamResult();
         this.getData();
         this.setInput();
     },
@@ -169,11 +157,11 @@
                 index=i;
                 return !!item.state;
             });
+            this.cur=index;
             if(f){
                 this.page='s';
                 return false;
             }
-            this.cur=index;
             if(index > this.allQuestion-1){
                 this.page='s';
                 return false;
@@ -183,20 +171,65 @@
         nextQuestion () {
             if(this.cur>=this.allQuestion-1){
                 this.page='s';
+                this.getExamResult();
                 return false;
             }
             this.domStr=this.comPoseDom(this.tempArr[++this.cur],this.cur);
 
         },
+        // 获取结果
+        getExamResult () {
+            fetch('/answer/getExamResult',{examId:this.paperId},'post',JSON.parse(getCookie('phToken')))
+                .then((res)=>{
+                    if(res.code===0){
+                        this.startAnsTime=res.data.startTime;
+                        this.endAnsTime=res.data.endTime;
+                    }else{
+                        this.$alert(res.msg,"提示")
+                    }
+                })
+                .catch((err)=>{
+                    this.$alert("数据加载异常",'提示')
+                })
+        },
+        // 获取问卷
+        getData () {
+            fetch('/question/listForMobile',{examNumber:this.paperId},'post',JSON.parse(getCookie('phToken')))
+                .then((res)=>{
+                    if(res.code===0){
+                        this.tempArr=res.data;
+                        this.allQuestion=this.tempArr.length;
+                        this.initQuestionIndex();
+
+                    }else{
+                        alert(res.msg);
+                    }
+                })
+                .catch((err) => {
+                    alert("数据加载异常");
+                })
+        },
         // 提交答案
         postAns () {
-            console.log(this.tempArr[this.cur])
             this.btnLoad=true;
-            fetch('data.json',{},'get','user')
+            let postData=this.tempArr[this.cur];
+            fetch('/answer/judgeAnswer',
+                {
+                    questionId:postData.id,
+                    examId:this.paperId,
+                    answer:postData.answer.input,
+                    isLast:(this.tempArr.length===this.cur+1)
+
+                }, 'post', JSON.parse(getCookie('phToken')))
                 .then((res)=>{
-                    this.tempArr[this.cur].state=true;
-                    this.nextQuestion();
                     this.btnLoad=false;
+                    if(res.code===0){
+                        this.tempArr[this.cur].state=true;
+                        this.nextQuestion();
+                    }else{
+                        alert(res.msg)
+                    }
+
                 })
                 .catch((err) => {
                     alert("数据加载异常");
@@ -219,7 +252,7 @@
                 }
                 if(f){
                     val.answer.input.push({
-                        group:val.len[i].group,
+                        groupId:val.len[i].groupId,
                         val:""
                     });
                     for(let k=0;k<val.len[i].l;k++){
@@ -316,20 +349,6 @@
             }
 
         },
-        // 获取问卷
-        getData () {
-            fetch('/question/listForMobile',{examNumber:this.paperId},'post',JSON.parse(getCookie('phToken')))
-                .then((res)=>{
-                console.log(res)
-                    this.tempArr=res;
-                    this.allQuestion=this.tempArr.length;
-                    this.initQuestionIndex();
-                })
-                .catch((err) => {
-                    alert("数据加载异常");
-                })
-        },
-
 
     }
 }

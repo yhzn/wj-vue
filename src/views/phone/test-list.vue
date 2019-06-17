@@ -64,7 +64,7 @@
                 <ul class="clearfix">
                     <li>姓名：{{data.info.name}}</li>
                     <li>工号：{{data.info.num}}</li>
-                    <li>科室：{{data.info.department}}</li>
+                    <li>科室：{{data.info.deptName}}</li>
                     <li>岗位：{{data.info.job}}</li>
                 </ul>
             </section>
@@ -72,7 +72,7 @@
                 <router-link :to="{path:`/phlayout/phans?id=${item.examNumber}`}">
                     <section class="n">
                         <section class="tip">
-                            <span v-if="!item.passState ">{{item.cur}} / {{item.total}}</span>
+                            <span v-if="!item.passState ">{{item.answeredQuestionCount}} / {{item.questionCount}}</span>
                         </section>
                         <h1>{{item.examName}}</h1>
 
@@ -129,15 +129,17 @@
                                 info:{
                                     name:res.data.staffName,
                                     num:res.data.staffNumber,
-                                    department:"***",
+                                    deptName:res.data.deptName,
                                     job:res.data.jobTitle,
                                 },
                                 list: res.data.examMains
                             }
+                      }else{
+                          alert(res.msg);
                       }
                 })
                 .catch((err)=>{
-
+                        alert("数据加载异常");
                 })
 
             }
